@@ -693,8 +693,10 @@ async function openAdminPanel() {
       } else if (u.status === 'denied') {
         actions.push(`<button type="button" class="tb-btn tb-btn-primary" data-action="approve" data-id="${u.id}">Riapprova</button>`);
       }
-      if (u.role !== 'admin' && u.status === 'approved') {
-        actions.push(`<button type="button" class="tb-btn tb-btn-ghost" data-action="admin" data-id="${u.id}">Rendi admin</button>`);
+      if (u.role !== 'admin') {
+        actions.push(`<button type="button" class="tb-btn tb-btn-primary" data-action="admin" data-id="${u.id}">Promuovi admin</button>`);
+      } else if (!isSelf) {
+        actions.push(`<button type="button" class="tb-btn tb-btn-ghost" data-action="demote" data-id="${u.id}">Rimuovi admin</button>`);
       }
 
       return `
@@ -713,7 +715,7 @@ async function openAdminPanel() {
     <div class="modal" style="max-width:720px">
       <h3>Gestione accessi</h3>
       <p style="color:var(--muted);font-size:12px;margin-bottom:16px">
-        Approva o nega chi può modificare il manuale condiviso.
+        Approva, nega o promuovi altri utenti ad amministratore.
       </p>
       <table class="admin-table">
         <thead><tr><th>Utente</th><th>Stato</th><th>Ruolo</th><th>Azioni</th></tr></thead>
@@ -739,7 +741,8 @@ async function openAdminPanel() {
       try {
         if (action === 'approve') await patchUser(id, { status: 'approved' });
         else if (action === 'deny') await patchUser(id, { status: 'denied' });
-        else if (action === 'admin') await patchUser(id, { role: 'admin' });
+        else if (action === 'admin') await patchUser(id, { role: 'admin', status: 'approved' });
+        else if (action === 'demote') await patchUser(id, { role: 'editor' });
         toast('Utente aggiornato ✓');
         closeModal();
         openAdminPanel();

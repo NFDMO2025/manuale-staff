@@ -14,6 +14,7 @@ const {
   getManual,
   saveManual,
   resetManual,
+  countAdmins,
 } = require('./db');
 const {
   isAdminUsername,
@@ -194,9 +195,25 @@ app.patch('/api/admin/users/:id', requireAdmin, (req, res) => {
     return res.status(400).json({ error: 'Non puoi negare l\'accesso a te stesso' });
   }
 
+  if (role === 'editor' && target.role === 'admin' && target.id === req.user.id) {
+    return res.status(400).json({ error: 'Non puoi rimuovere il tuo ruolo admin' });
+  }
+
+  if (role === 'editor' && target.role === 'admin' && countAdmins() <= 1) {
+    return res.status(400).json({ error: 'Deve restare almeno un amministratore' });
+  }
+
+  let newStatus = status ?? target.status;
+  let newRole = role ?? target.role;
+
+  if (role === 'admin') {
+    newRole = 'admin';
+    newStatus = 'approved';
+  }
+
   const updated = updateUserAccess(id, {
-    status: status || undefined,
-    role: role || undefined,
+    status: newStatus,
+    role: newRole,
   });
 
   res.json(updated);
