@@ -38,7 +38,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 if (!process.env.JWT_SECRET) {
-  console.error('❌ Configura JWT_SECRET nel file .env');
+  console.error('❌ JWT_SECRET mancante — aggiungilo alle variabili d\'ambiente (Render: Environment)');
   process.exit(1);
 }
 
