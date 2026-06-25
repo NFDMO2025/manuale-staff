@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manuale Sanzioni Staff</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: #f8f9fb; color: #1a1a2e; font-size: 13px; line-height: 1.5; }
+
+  .page { max-width: 960px; margin: 0 auto; padding: 32px 24px 64px; }
+
+  /* HEADER */
+  .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 36px; padding-bottom: 20px; border-bottom: 2px solid #1a1a2e; }
+  .header-left { display: flex; align-items: center; gap: 16px; }
+  .header-badge { width: 44px; height: 44px; background: #1a1a2e; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+  .header-title { font-size: 22px; font-weight: 700; color: #1a1a2e; letter-spacing: -0.02em; }
+  .header-sub { font-size: 12px; color: #6b7280; margin-top: 2px; font-weight: 400; }
+  .header-stamp { background: #1a1a2e; color: #fff; font-size: 10px; font-weight: 600; padding: 5px 12px; border-radius: 4px; letter-spacing: 0.08em; }
+
+  /* LEGEND */
+  .legend-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 36px; }
+  .leg { padding: 12px 14px; border-radius: 8px; border: 1px solid; }
+  .leg-g { background: #f0fdf4; border-color: #bbf7d0; }
+  .leg-o { background: #fff7ed; border-color: #fed7aa; }
+  .leg-r { background: #fef2f2; border-color: #fecaca; }
+  .leg-p { background: #faf5ff; border-color: #e9d5ff; }
+  .leg-label { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .leg-g .leg-label { color: #15803d; }
+  .leg-o .leg-label { color: #c2410c; }
+  .leg-r .leg-label { color: #b91c1c; }
+  .leg-p .leg-label { color: #7c3aed; }
+  .leg-desc { font-size: 11px; color: #6b7280; line-height: 1.4; }
+
+  /* SECTION */
+  .section { margin-bottom: 32px; }
+  .section-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .section-num { width: 28px; height: 28px; border-radius: 6px; background: #1a1a2e; color: #fff; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .section-title { font-size: 13px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.04em; text-transform: uppercase; }
+  .section-line { flex: 1; height: 1px; background: #e5e7eb; }
+
+  /* RULES TABLE */
+  .rules-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 10px; overflow: hidden; border: 1px solid #e5e7eb; }
+  .rules-table thead tr { background: #1a1a2e; }
+  .rules-table thead th { padding: 10px 14px; text-align: left; font-size: 10px; font-weight: 600; color: #9ca3af; letter-spacing: 0.08em; text-transform: uppercase; }
+  .rules-table tbody tr { border-bottom: 1px solid #f3f4f6; }
+  .rules-table tbody tr:last-child { border-bottom: none; }
+  .rules-table tbody tr:hover { background: #fafafa; }
+  .rules-table td { padding: 10px 14px; vertical-align: top; }
+
+  .col-rule { width: 90px; }
+  .col-name { width: 180px; }
+  .col-desc { }
+  .col-sanction { width: 160px; }
+  .col-recidiva { width: 170px; }
+
+  .rule-code { font-size: 10px; font-weight: 700; color: #6b7280; letter-spacing: 0.05em; }
+  .rule-name { font-size: 12px; font-weight: 600; color: #1a1a2e; }
+  .rule-desc { font-size: 11px; color: #6b7280; line-height: 1.45; }
+
+  /* PILLS */
+  .pill { display: inline-block; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 4px; letter-spacing: 0.04em; white-space: nowrap; margin: 2px 2px 2px 0; }
+  .pill-g { background: #dcfce7; color: #15803d; }
+  .pill-o { background: #ffedd5; color: #c2410c; }
+  .pill-r { background: #fee2e2; color: #b91c1c; }
+  .pill-p { background: #f3e8ff; color: #7c3aed; }
+  .pill-b { background: #dbeafe; color: #1d4ed8; }
+  .pill-gray { background: #f3f4f6; color: #4b5563; }
+  .pill-perm { background: #1a1a2e; color: #fff; }
+
+  .arrow { font-size: 10px; color: #d1d5db; margin: 0 2px; }
+  .rec-label { font-size: 10px; color: #9ca3af; display: block; margin-bottom: 2px; }
+
+  /* ALERT */
+  .alert { border-radius: 8px; padding: 12px 16px; margin-top: 10px; border-left: 3px solid; }
+  .alert-r { background: #fef2f2; border-color: #ef4444; }
+  .alert-o { background: #fff7ed; border-color: #f97316; }
+  .alert-b { background: #eff6ff; border-color: #3b82f6; }
+  .alert-title { font-size: 11px; font-weight: 700; margin-bottom: 4px; }
+  .alert-r .alert-title { color: #b91c1c; }
+  .alert-o .alert-title { color: #c2410c; }
+  .alert-b .alert-title { color: #1d4ed8; }
+  .alert-body { font-size: 11px; color: #4b5563; line-height: 1.5; }
+
+  /* CHECKLIST */
+  .checklist { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; }
+  .check-row { display: flex; align-items: flex-start; gap: 14px; padding: 12px 16px; border-bottom: 1px solid #f3f4f6; }
+  .check-row:last-child { border-bottom: none; }
+  .check-n { width: 24px; height: 24px; min-width: 24px; border-radius: 6px; background: #1a1a2e; color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .check-t { font-size: 12px; color: #374151; line-height: 1.5; padding-top: 3px; }
+
+  .footer { text-align: center; font-size: 11px; color: #9ca3af; margin-top: 40px; padding-top: 20px; border-top: 1px solid #e5e7eb; }
+
+  @media print {
+    body { background: #fff; }
+    .page { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <div class="header-badge">⚖️</div>
+      <div>
+        <div class="header-title">Manuale Sanzioni Staff</div>
+        <div class="header-sub">Pannello operativo — uso interno riservato</div>
+      </div>
+    </div>
+    <div class="header-stamp">USO RISERVATO</div>
+  </div>
+
+  <!-- LEGENDA -->
+  <div class="legend-grid">
+    <div class="leg leg-g"><div class="leg-label">WARN 1 / 2</div><div class="leg-desc">Avvertimento. Al 2° si scala di livello.</div></div>
+    <div class="leg leg-o"><div class="leg-label">BAN 24H – 48H</div><div class="leg-desc">Ban breve. Infrazioni medie o prime recidive.</div></div>
+    <div class="leg leg-r"><div class="leg-label">BAN 3 – 7 GG</div><div class="leg-desc">Ban esteso. Violazioni gravi o recidive.</div></div>
+    <div class="leg leg-p"><div class="leg-label">PERMABAN</div><div class="leg-desc">Irrevocabile. Solo senior staff può revocare.</div></div>
+  </div>
+
+  <!-- CAT 1 -->
+  <div class="section">
+    <div class="section-head"><div class="section-num">1</div><div class="section-title">Comportamento Roleplay</div><div class="section-line"></div></div>
+    <table class="rules-table">
+      <thead><tr><th class="col-rule">Regola</th><th class="col-name">Violazione</th><th class="col-desc">Descrizione</th><th class="col-sanction">Sanzione</th><th class="col-recidiva">In caso di recidiva</th></tr></thead>
+      <tbody>
+        <tr><td class="col-rule"><span class="rule-code">1.1</span></td><td><span class="rule-name">Fail RP</span></td><td class="rule-desc">Comportamento non conforme al personaggio o alla situazione roleplay.</td><td><span class="pill pill-g">WARN 1°</span><span class="pill pill-g">WARN 2°</span></td><td><span class="rec-label">3ª volta</span><span class="pill pill-o">BAN 24H</span></td></tr>
+        <tr><td class="col-rule"><span class="rule-code">1.3 + 2.22</span></td><td><span class="rule-name">Powergame</span></td><td class="rule-desc">Forzare azioni sul personaggio altrui o sfruttare meccaniche in modo sleale.</td><td><span class="pill pill-g">WARN 1°</span><span class="pill pill-g">WARN 2°</span></td><td><span class="pill pill-o">BAN 24H</span></td></tr>
+        <tr><td class="col-rule"><span class="rule-code">1.5</span></td><td><span class="rule-name">VDM / RDM</span></td><td class="rule-desc">Uccidere o investire altri giocatori senza valida motivazione RP.</td><td><span class="pill pill-o">BAN 24H</span></td><td><span class="rec-label">se intenzionale</span><span class="pill pill-r">BAN 3–7 GG</span></td></tr>
+        <tr><td class="col-rule"><span class="rule-code">1.7</span></td><td><span class="rule-name">Revenge Kill</span></td><td class="rule-desc">Tornare a colpire chi vi ha eliminato sfruttando la memoria fuori RP.</td><td><span class="pill pill-o">BAN 24H</span></td><td>—</td></tr>
+        <tr><td class="col-rule"><span class="rule-code">1.8</span></td><td><span class="rule-name">Bug Abusing</span></td><td class="rule-desc">Sfruttare bug o glitch del gioco per ottenere vantaggi.</td><td><span class="pill pill-r">BAN 3 GG</span></td><td><span class="rec-label">se grave</span><span class="pill pill-perm">PERMABAN</span></td></tr>
+        <tr><td class="col-rule"><span class="rule-code">1.9</span></td><td><span class="rule-name">Mix Chat</span></td><td class="rule-desc">Usare informazioni della chat OOC all'interno del roleplay.</td><td><span class="pill pill-g">WARN 1°</span></td><td><span class="pill pill-o">BAN 24H</span></td></tr>
+        <tr><td class="col-rule"><span class="rule-code">1.10</span></td><td><span class="rule-name">Metagame</span></td><td class="rule-desc">Usare info esterne al personaggio (stream, Discord, ecc.) nel RP.</td><td><span class="pill pill-r">BAN 3 GG</span></td><td><span class="pill pill-r">7 GG</span> / <span class="pill pill-perm">PERMABAN</span></td></tr>
+        <tr><td class="col-rule"><span class="rule-code">1.11</span></td><td><span class="rule-name">Combat Log</span></td><td class="rule-desc">Disconnettersi o respawnare durante un'azione attiva.</td><td><span class="pill pill-o">BAN 24H</span></td><td><span class="rec-label">progressivo</span><span class="pill pill-o">48H → +72H</span></td></tr>
+      </tbody>
+    </table>
+    <div class="alert alert-r"><div class="alert-title">Progressione regola 1.11</div><div class="alert-body">1ª recidiva = 48h &middot; 2ª recidiva = 48h &middot; dalla 3ª in poi ogni volta +72h sulla precedente. Documentate sempre con screenshot o log.</div></div>
+  </div>
+
+  <!-- CAT 2 -->
+  <div class="section">
+    <div class="section-head"><div class="section-num">2</div><div class="section-title">Azioni in Gioco e Comportamento</div><div class="section-line"></div></div>
+    <table class="rules-table">
+      <thead><tr><th class="col-rule">Regola</th><th class="col-name">Violazione</th><th class="col-desc">Descrizione</th><th class="col-sanction">Sanzione</th><th class="col-recidiva">In caso di recidiva</th></tr></thead>
+      <tbody>
+        <tr><td><span class="rule-code">2.1 + 6.3</span></td><td><span class="rule-name">Loot Errato</span></td><td class="rule-desc">Raccogliere oggetti non consentiti dalla situazione RP.</td><td><span class="pill pill-g">WARN 1°</span></td><td>—</td></tr>
+        <tr><td><span class="rule-code">2.1 + 6.2</span></td><td><span class="rule-name">Azione a scopo di loot</span></td><td class="rule-desc">Avviare un'azione con il solo fine di saccheggiare.</td><td><span class="pill pill-g">WARN 1°</span><span class="pill pill-g">WARN 2°</span></td><td>—</td></tr>
+        <tr><td><span class="rule-code">2.6</span></td><td><span class="rule-name">Azioni in safe zone</span></td><td class="rule-desc">Compiere azioni ostili all'interno di zone protette.</td><td><span class="pill pill-g">WARN 1°</span></td><td><span class="pill pill-o">BAN 24H</span></td></tr>
+        <tr><td><span class="rule-code">2.10</span></td><td><span class="rule-name">Respawn improprio</span></td><td class="rule-desc">Utilizzare il respawn per aggirare situazioni RP svantaggiose.</td><td><span class="pill pill-g">WARN 1°</span></td><td><span class="pill pill-o">BAN 24H</span></td></tr>
+        <tr style="background:#faf5ff;"><td><span class="rule-code">2.11</span></td><td><span class="rule-name">Comportamento discriminatorio</span></td><td class="rule-desc">Qualsiasi comportamento sessista, discriminatorio o degradante verso altri giocatori.</td><td><span class="pill pill-perm">PERMABAN</span></td><td><span style="font-size:10px;color:#7c3aed;font-weight:600;">Irrevocabile — nessuna eccezione</span></td></tr>
+        <tr><td><span class="rule-code">2.12</span></td><td><span class="rule-name">Furto veicoli d'emergenza</span></td><td class="rule-desc">Sottrarre mezzi di polizia, ambulanza o pompieri.</td><td><span class="pill pill-g">WARN 1°</span></td><td><span class="pill pill-o">BAN 24H</span></td></tr>
+        <tr><td><span class="rule-code">2.15</span></td><td><span class="rule-name">Alt abuse</span></td><td class="rule-desc">Interazione tra personaggi dello stesso giocatore.</td><td><span class="pill pill-o">BAN 24H</span></td><td><span class="pill pill-o">BAN 48H</span></td></tr>
+        <tr><td><span class="rule-code">2.18</span></td><td><span class="rule-name">Insulti a soggetto atterrato</span></td><td class="rule-desc">Provocare o degradare chi è a terra o fuori combattimento.</td><td><span class="pill pill-g">WARN 1°</span></td><td><span class="pill pill-o">BAN 24H</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- CAT 3 -->
+  <div class="section">
+    <div class="section-head"><div class="section-num">3</div><div class="section-title">Eventi Organizzati</div><div class="section-line"></div></div>
+    <table class="rules-table">
+      <thead><tr><th class="col-rule">Regola</th><th class="col-name">Violazione</th><th class="col-desc">Descrizione</th><th class="col-sanction">Sanzione</th><th class="col-recidiva">In caso di recidiva</th></tr></thead>
+      <tbody>
+        <tr><td><span class="rule-code">3.5</span></td><td><span class="rule-name">Azioni durante evento</span></td><td class="rule-desc">Disturbare o interrompere eventi ufficiali con azioni ostili non autorizzate.</td><td><span class="pill pill-g">WARN 1°</span><span class="pill pill-g">WARN 2°</span></td><td><span class="pill pill-o">BAN 24H</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- CAT 4 -->
+  <div class="section">
+    <div class="section-head"><div class="section-num">4</div><div class="section-title">Forze dell'Ordine (FDO)</div><div class="section-line"></div></div>
+    <table class="rules-table">
+      <thead><tr><th class="col-rule">Regola</th><th class="col-name">Violazione</th><th class="col-desc">Descrizione</th><th class="col-sanction">Sanzione</th><th class="col-recidiva">In caso di recidiva</th></tr></thead>
+      <tbody>
+        <tr style="background:#faf5ff;"><td><span class="rule-code">4.2</span></td><td><span class="rule-name">Corruzione non autorizzata</span></td><td class="rule-desc">Interpretare un agente corrotto senza approvazione staff.</td><td><span class="pill pill-perm">PERMABAN</span></td><td>—</td></tr>
+        <tr><td><span class="rule-code">4.5</span></td><td><span class="rule-name">Licenziamento FDO + uso info</span></td><td class="rule-desc">Usare informazioni acquisite in servizio dopo il licenziamento.</td><td><span class="pill pill-r">BAN 24H+</span><span class="pill pill-b">WIPE</span><span class="pill pill-r">7 GG LEGALE</span></td><td>Escalation</td></tr>
+        <tr><td><span class="rule-code">4.11</span></td><td><span class="rule-name">Police Bait</span></td><td class="rule-desc">Provocare le FDO per innescare inseguimenti o situazioni forzate.</td><td><span class="pill pill-g">WARN 1°</span></td><td><span class="pill pill-o">BAN 24H</span></td></tr>
+        <tr><td><span class="rule-code">4.12</span></td><td><span class="rule-name">Rapimento FDO / EMS</span></td><td class="rule-desc">Sequestrare agenti o sanitari senza via libera staff.</td><td><span class="pill pill-o">BAN 24H</span></td><td><span class="pill pill-o">BAN 48H</span></td></tr>
+      </tbody>
+    </table>
+    <div class="alert alert-o"><div class="alert-title">Nota — Regola 4.5</div><div class="alert-body">Sanzione cumulativa: Ban 24h + Wipe inventario/denaro + 7 giorni di conseguenze legali in RP. Coordinate sempre con il senior staff prima di applicarla.</div></div>
+  </div>
+
+  <!-- CAT 6 -->
+  <div class="section">
+    <div class="section-head"><div class="section-num">6</div><div class="section-title">Combattimento e Tattiche</div><div class="section-line"></div></div>
+    <table class="rules-table">
+      <thead><tr><th class="col-rule">Regola</th><th class="col-name">Violazione</th><th class="col-desc">Descrizione</th><th class="col-sanction">Sanzione</th><th class="col-recidiva">In caso di recidiva</th></tr></thead>
+      <tbody>
+        <tr><td><span class="rule-code">6.3</span></td><td><span class="rule-name">Nascondersi nei cespugli</span></td><td class="rule-desc">Usare la vegetazione come copertura tattica abusiva.</td><td><span class="pill pill-b">ANNULL. AZIONE</span></td><td>—</td></tr>
+        <tr><td><span class="rule-code">6.5</span></td><td><span class="rule-name">Sparare dal lato guida</span></td><td class="rule-desc">Aprire il fuoco dal posto di guida di un veicolo.</td><td><span class="pill pill-b">ANNULL. AZIONE</span></td><td>—</td></tr>
+        <tr><td><span class="rule-code">6.16</span></td><td><span class="rule-name">Criminali &gt; 10</span></td><td class="rule-desc">Partecipare a un'azione criminale con più di 10 persone. Rifarsi alla regola 6.21.</td><td><span class="pill pill-r">AZIONE PERSA</span></td><td><span style="font-size:10px;color:#6b7280;">automatico, nessuna discrezionalità</span></td></tr>
+        <tr><td><span class="rule-code">6.20</span></td><td><span class="rule-name">Uso caschi in azione</span></td><td class="rule-desc">Indossare casco durante un'azione senza autorizzazione fazione.</td><td><span class="pill pill-b">ANNULL. AZIONE</span><span class="pill pill-gray">RICHIAMO</span></td><td>—</td></tr>
+        <tr><td><span class="rule-code">6.23</span></td><td><span class="rule-name">Utilizzo tetti</span></td><td class="rule-desc">Sparare o appostarsi sui tetti durante le azioni.</td><td><span class="pill pill-g">WARN 1°</span></td><td><span class="pill pill-o">BAN 24H</span></td></tr>
+      </tbody>
+    </table>
+    <div class="alert alert-b"><div class="alert-title">Annullamento azione — come applicarlo</div><div class="alert-body">L'intera sequenza di eventi viene invalidata retroattivamente: niente loot, nessun risultato RP. Informatene tutte le parti coinvolte prima di procedere.</div></div>
+  </div>
+
+  <!-- CAT 7 -->
+  <div class="section">
+    <div class="section-head"><div class="section-num">7</div><div class="section-title">EMS / Servizi di Emergenza</div><div class="section-line"></div></div>
+    <table class="rules-table">
+      <thead><tr><th class="col-rule">Regola</th><th class="col-name">Violazione</th><th class="col-desc">Descrizione</th><th class="col-sanction">Sanzione</th><th class="col-recidiva">In caso di recidiva</th></tr></thead>
+      <tbody>
+        <tr><td><span class="rule-code">7.2</span></td><td><span class="rule-name">Uso /ambulanza</span></td><td class="rule-desc">Usare il comando senza poi spawnare in ospedale a fine azione.</td><td><span class="pill pill-g">WARN 1°</span></td><td>—</td></tr>
+        <tr><td><span class="rule-code">7.5</span></td><td><span class="rule-name">Ritorno campi &lt; 30 min</span></td><td class="rule-desc">Rientrare in zona operativa prima del tempo minimo obbligatorio.</td><td><span class="pill pill-gray">RICHIAMO FAZIONE</span></td><td>—</td></tr>
+        <tr><td><span class="rule-code">7.8</span></td><td><span class="rule-name">Campi di raccolta</span></td><td class="rule-desc">Presenza non autorizzata nelle aree di raccolta risorse.</td><td><span class="pill pill-gray">RICHIAMO FAZIONE</span></td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- CAT 9 -->
+  <div class="section">
+    <div class="section-head"><div class="section-num">9</div><div class="section-title">Criminalità Organizzata</div><div class="section-line"></div></div>
+    <table class="rules-table">
+      <thead><tr><th class="col-rule">Regola</th><th class="col-name">Violazione</th><th class="col-desc">Descrizione</th><th class="col-sanction">Sanzione</th><th class="col-recidiva">In caso di recidiva</th></tr></thead>
+      <tbody>
+        <tr><td><span class="rule-code">9.10</span></td><td><span class="rule-name">Ostaggio NPC</span></td><td class="rule-desc">Prendere in ostaggio personaggi non giocanti. L'azione rimane comunque valida.</td><td><span class="pill pill-g">WARN 1°</span></td><td>—</td></tr>
+        <tr><td><span class="rule-code">9.13</span></td><td><span class="rule-name">Gang — rapine vietate</span></td><td class="rule-desc">Partecipare a rapine con una gang non autorizzata.</td><td><span class="pill pill-gray">RICHIAMO FAZIONE</span></td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- CHECKLIST -->
+  <div class="section">
+    <div class="section-head"><div class="section-num">✓</div><div class="section-title">Checklist prima di sanzionare</div><div class="section-line"></div></div>
+    <div class="checklist">
+      <div class="check-row"><div class="check-n">1</div><div class="check-t">Identificate con precisione la regola violata e il suo numero.</div></div>
+      <div class="check-row"><div class="check-n">2</div><div class="check-t">Verificate se è un primo episodio o una recidiva — controllate lo storico sanzioni.</div></div>
+      <div class="check-row"><div class="check-n">3</div><div class="check-t">Raccogliete le prove: screenshot, clip video, log di chat. Prima di procedere.</div></div>
+      <div class="check-row"><div class="check-n">4</div><div class="check-t">Applicate la sanzione corretta secondo questo manuale, senza aumentarla arbitrariamente.</div></div>
+      <div class="check-row"><div class="check-n">5</div><div class="check-t">Per PERMABAN e sanzioni complesse (es. 4.5) consultate sempre il senior staff.</div></div>
+      <div class="check-row"><div class="check-n">6</div><div class="check-t">Documentate nel sistema interno: regola violata, prova, sanzione applicata.</div></div>
+    </div>
+  </div>
+
+  <div class="footer">Documento riservato allo staff &middot; Aggiornare in caso di modifiche al regolamento</div>
+
+</div>
+</body>
+</html>
