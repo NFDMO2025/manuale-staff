@@ -717,8 +717,11 @@ async function openAdminPanel(filter) {
   if (filter) state.adminFilter = filter;
   closeModal();
   let users;
+  let meta = {};
   try {
-    users = await api('/api/admin/users');
+    const result = await api('/api/admin/users');
+    users = result.users || result;
+    meta = result.meta || {};
   } catch (err) {
     toast(err.message || 'Errore caricamento utenti');
     return;
@@ -774,15 +777,20 @@ async function openAdminPanel(filter) {
     )
     .join('');
 
+  const storageWarning = meta.ephemeral
+    ? `<div class="admin-warning">Attenzione: il database su Render non è persistente. Gli utenti registrati possono sparire dopo un riavvio. Configura Turso per salvare tutti gli account in modo permanente.</div>`
+    : '';
+
   const backdrop = document.createElement('div');
   backdrop.className = 'modal-backdrop';
   backdrop.innerHTML = `
     <div class="modal admin-modal">
       <h3>Gestione accessi</h3>
       <p class="admin-intro">
-        Elenco completo degli account registrati. Da qui puoi vedere chi può entrare nel manuale,
-        chi è amministratore e rimuovere l'accesso a chi non deve più usarlo.
+        Elenco completo degli account registrati (${meta.total ?? users.length} totali).
+        Da qui puoi vedere chi può entrare, chi è admin e rimuovere l'accesso.
       </p>
+      ${storageWarning}
 
       <div class="admin-stats">
         <div class="admin-stat">

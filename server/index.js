@@ -4,6 +4,7 @@ const cookieParser = require('cookie-parser');
 const path = require('path');
 const {
   initDb,
+  getStorageMode,
   createUser,
   findUserWithPassword,
   findUserByUsername,
@@ -39,28 +40,26 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 if (!process.env.JWT_SECRET) {
-  console.error('❌ JWT_SECRET mancante — aggiungilo alle variabili d\'ambiente (Render: Environment)');
+  console.error('JWT_SECRET mancante — aggiungilo alle variabili d\'ambiente (Render: Environment)');
   process.exit(1);
 }
-
-initDb();
 
 async function ensureDefaultAdmin() {
   const username = (process.env.ADMIN_USERNAME || '').trim().toLowerCase();
   const password = process.env.ADMIN_PASSWORD || '';
   if (!username || !password) return;
 
-  if (findUserByUsername(username)) return;
+  if (await findUserByUsername(username)) return;
 
   const passwordHash = await hashPassword(password);
-  createUser({
+  await createUser({
     username,
     passwordHash,
     name: process.env.ADMIN_NAME || 'Admin',
     status: 'approved',
     role: 'admin',
   });
-  console.log(`✅ Account admin creato: ${username}`);
+  console.log(`Account admin creato: ${username}`);
 }
 
 function publicUser(user) {
@@ -70,19 +69,19 @@ function publicUser(user) {
     name: user.name,
     status: user.status,
     role: user.role,
+    createdAt: user.createdAt,
   };
 }
 
-function resolveNewUserRole(username) {
-  const isFirstUser = countUsers() === 0;
+async function resolveNewUserRole(username) {
+  const total = await countUsers();
+  const isFirstUser = total === 0;
   const isAdmin = isFirstUser || isAdminUsername(username);
   return {
     status: isAdmin ? 'approved' : 'pending',
     role: isAdmin ? 'admin' : 'editor',
   };
 }
-
-ensureDefaultAdmin().catch((err) => console.error('Errore creazione admin:', err.message));
 
 app.use(express.json({ limit: '2mb' }));
 app.use(cookieParser());
@@ -101,13 +100,13 @@ app.post('/api/auth/register', async (req, res) => {
     const nameErr = validateName(name);
     if (nameErr) return res.status(400).json({ error: nameErr });
 
-    if (findUserByUsername(username)) {
+    if (await findUserByUsername(username)) {
       return res.status(409).json({ error: 'Username già in uso' });
     }
 
-    const { status, role } = resolveNewUserRole(username);
+    const { status, role } = await resolveNewUserRole(username);
     const passwordHash = await hashPassword(password);
-    const user = createUser({ username, passwordHash, name, status, role });
+    const user = await createUser({ username, passwordHash, name, status, role });
 
     const token = signSession(user);
     setSessionCookie(res, token);
@@ -128,7 +127,7 @@ app.post('/api/auth/login', async (req, res) => {
       return res.status(400).json({ error: 'Username e password obbligatori' });
     }
 
-    const row = findUserWithPassword(username);
+    const row = await findUserWithPassword(username);
     if (!row) {
       return res.status(401).json({ error: 'Credenziali non valide' });
     }
@@ -138,7 +137,7 @@ app.post('/api/auth/login', async (req, res) => {
       return res.status(401).json({ error: 'Credenziali non valide' });
     }
 
-    const user = findUserById(row.id);
+    const user = await findUserById(row.id);
     const token = signSession(user);
     setSessionCookie(res, token);
 
@@ -161,32 +160,42 @@ app.post('/api/auth/logout', (_req, res) => {
   res.json({ ok: true });
 });
 
-app.get('/api/manual', requireApproved, (_req, res) => {
-  res.json(getManual());
+app.get('/api/manual', requireApproved, async (_req, res) => {
+  res.json(await getManual());
 });
 
-app.put('/api/manual', requireApproved, (req, res) => {
+app.put('/api/manual', requireApproved, async (req, res) => {
   if (!req.body?.data) {
     return res.status(400).json({ error: 'Dati manuale mancanti' });
   }
-  const result = saveManual(req.body.data, req.user.username);
+  const result = await saveManual(req.body.data, req.user.username);
   res.json(result);
 });
 
-app.post('/api/manual/reset', requireAdmin, (req, res) => {
-  const result = resetManual(req.user.username);
-  res.json({ ...result, data: getManual().data });
+app.post('/api/manual/reset', requireAdmin, async (req, res) => {
+  const result = await resetManual(req.user.username);
+  const manual = await getManual();
+  res.json({ ...result, data: manual.data });
 });
 
-app.get('/api/admin/users', requireAdmin, (_req, res) => {
-  res.json(listUsers());
+app.get('/api/admin/users', requireAdmin, async (_req, res) => {
+  const users = await listUsers();
+  const storage = getStorageMode();
+  res.json({
+    users,
+    meta: {
+      storage,
+      total: users.length,
+      ephemeral: storage === 'sqlite' && process.env.NODE_ENV === 'production',
+    },
+  });
 });
 
-app.patch('/api/admin/users/:id', requireAdmin, (req, res) => {
+app.patch('/api/admin/users/:id', requireAdmin, async (req, res) => {
   const id = parseInt(req.params.id, 10);
   const { status, role } = req.body;
 
-  const target = findUserById(id);
+  const target = await findUserById(id);
   if (!target) {
     return res.status(404).json({ error: 'Utente non trovato' });
   }
@@ -199,7 +208,7 @@ app.patch('/api/admin/users/:id', requireAdmin, (req, res) => {
     return res.status(400).json({ error: 'Non puoi rimuovere il tuo ruolo admin' });
   }
 
-  if (role === 'editor' && target.role === 'admin' && countAdmins() <= 1) {
+  if (role === 'editor' && target.role === 'admin' && (await countAdmins()) <= 1) {
     return res.status(400).json({ error: 'Deve restare almeno un amministratore' });
   }
 
@@ -211,7 +220,7 @@ app.patch('/api/admin/users/:id', requireAdmin, (req, res) => {
     newStatus = 'approved';
   }
 
-  const updated = updateUserAccess(id, {
+  const updated = await updateUserAccess(id, {
     status: newStatus,
     role: newRole,
   });
@@ -219,14 +228,31 @@ app.patch('/api/admin/users/:id', requireAdmin, (req, res) => {
   res.json(updated);
 });
 
-app.use(express.static(path.join(__dirname, '..', 'public')));
+app.use(express.static(path.join(__dirname, '..', 'public'), {
+  maxAge: process.env.NODE_ENV === 'production' ? '1h' : 0,
+  setHeaders(res, filePath) {
+    if (filePath.endsWith('.js') || filePath.endsWith('.css')) {
+      res.setHeader('Cache-Control', 'no-cache');
+    }
+  },
+}));
 
 app.get('*', (_req, res) => {
   res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
 });
 
-app.listen(PORT, () => {
-  console.log(`🌐 Manuale Staff → http://localhost:${PORT}`);
-  const adminUser = process.env.ADMIN_USERNAME || '(primo registrato diventa admin)';
-  console.log(`👑 Admin: ${adminUser}`);
+async function start() {
+  await initDb();
+  await ensureDefaultAdmin();
+
+  app.listen(PORT, () => {
+    console.log(`Manuale Staff -> http://localhost:${PORT}`);
+    console.log(`Database: ${getStorageMode()}`);
+    console.log(`Admin: ${process.env.ADMIN_USERNAME || '(primo registrato)'}`);
+  });
+}
+
+start().catch((err) => {
+  console.error('Avvio fallito:', err);
+  process.exit(1);
 });
