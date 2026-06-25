@@ -1049,8 +1049,8 @@ body.editing .item-del { display: inline-flex; }
 .status-approved { background: #dcfce7; color: #166534; }
 .status-denied { background: var(--danger-soft); color: #991b1b; }
 
-.admin-actions { display: flex; gap: 4px; flex-wrap: wrap; }
-.admin-actions button { font-size: 10px; padding: 5px 9px; }
+.admin-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.admin-actions button { font-size: 11px; padding: 6px 10px; }
 
 /* Admin panel — gestione accessi */
 .admin-modal { max-width: 860px; }
@@ -1070,8 +1070,90 @@ body.editing .item-del { display: inline-flex; }
   padding: 12px 14px;
   font-size: 12px;
   color: #92400e;
-  line-height: 1.5;
+  line-height: 1.55;
   margin-bottom: 16px;
+}
+
+.admin-info {
+  background: var(--teal-soft);
+  border: 1px solid #99f6e4;
+  border-left: 4px solid var(--teal);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  font-size: 12px;
+  color: #115e59;
+  margin-bottom: 16px;
+}
+
+.admin-create-box {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  background: var(--surface-soft);
+}
+
+.admin-create-box summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.admin-create-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.admin-create-form label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.admin-create-form input,
+.admin-create-form select {
+  width: 100%;
+  padding: 9px 11px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  font-family: var(--sans);
+  font-size: 13px;
+}
+
+.admin-edit-modal { max-width: 520px; }
+
+.admin-edit-sub {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+  margin: -8px 0 16px;
+}
+
+.admin-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  margin-bottom: 16px;
+  cursor: pointer;
+}
+
+.modal-backdrop-top { z-index: 1200; }
+
+.admin-permanent {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--teal);
+  background: var(--teal-soft);
+  padding: 2px 6px;
+  border-radius: 4px;
 }
 
 .admin-stats {
@@ -1166,6 +1248,7 @@ body.editing .item-del { display: inline-flex; }
 
 .access-full { background: #ede9fe; color: #5b21b6; }
 .access-yes { background: #dcfce7; color: #166534; }
+.access-readonly { background: #e0f2fe; color: #0369a1; }
 .access-pending { background: var(--warn-soft); color: #92400e; }
 .access-no { background: var(--danger-soft); color: #991b1b; }
 
@@ -1181,6 +1264,7 @@ body.editing .item-del { display: inline-flex; }
 
 .role-admin { background: rgba(30, 58, 95, 0.12); color: var(--brand); }
 .role-editor { background: var(--surface-soft); color: var(--muted); }
+.role-watcher { background: #f0f9ff; color: #0369a1; }
 
 .admin-row-denied { opacity: 0.85; }
 .admin-row-denied .admin-user-name { color: var(--muted); }

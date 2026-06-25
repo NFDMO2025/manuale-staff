@@ -458,6 +458,10 @@ function closeModal() {
 }
 
 function toggleEdit() {
+  if (!canEditManual()) {
+    toast('Il tuo ruolo consente solo la visualizzazione');
+    return;
+  }
   state.editing = !state.editing;
   document.body.classList.toggle('editing', state.editing);
   document.getElementById('toolbar').classList.toggle('editing', state.editing);
@@ -565,10 +569,33 @@ function updateUserChip() {
   chip.title = state.user.name;
 }
 
+function canEditManual() {
+  return state.user?.status === 'approved'
+    && (state.user.role === 'admin' || state.user.role === 'editor');
+}
+
+function roleLabel(role) {
+  if (role === 'admin') return 'Amministratore';
+  if (role === 'watcher') return 'Watcher';
+  return 'Editor';
+}
+
 function updateAdminUi() {
   const isAdmin = state.user?.role === 'admin' && state.user?.status === 'approved';
+  const canEdit = canEditManual();
+
   document.getElementById('btn-admin').classList.toggle('hidden', !isAdmin);
   document.getElementById('btn-reset').classList.toggle('hidden', !isAdmin);
+  document.getElementById('btn-edit').classList.toggle('hidden', !canEdit);
+  document.getElementById('btn-import').classList.toggle('hidden', !canEdit);
+
+  if (!canEdit && state.editing) {
+    state.editing = false;
+    document.body.classList.remove('editing');
+    document.getElementById('toolbar').classList.remove('editing');
+    document.getElementById('btn-save').classList.add('hidden');
+    document.getElementById('btn-edit').textContent = 'Modifica';
+  }
 }
 
 async function submitLogin(e) {
@@ -670,9 +697,13 @@ function formatDate(ts) {
 
 function accessSummary(user) {
   if (user.status === 'approved') {
-    return user.role === 'admin'
-      ? { label: 'Accesso attivo', sub: 'Amministratore', class: 'access-full' }
-      : { label: 'Accesso attivo', sub: 'Editor', class: 'access-yes' };
+    if (user.role === 'admin') {
+      return { label: 'Accesso attivo', sub: 'Amministratore', class: 'access-full' };
+    }
+    if (user.role === 'watcher') {
+      return { label: 'Accesso attivo', sub: 'Solo lettura', class: 'access-readonly' };
+    }
+    return { label: 'Accesso attivo', sub: 'Editor', class: 'access-yes' };
   }
   if (user.status === 'pending') {
     return { label: 'In attesa', sub: 'Non ancora approvato', class: 'access-pending' };
@@ -686,31 +717,105 @@ function userMatchesFilter(user, filter) {
   if (filter === 'pending') return user.status === 'pending';
   if (filter === 'blocked') return user.status === 'denied';
   if (filter === 'admin') return user.role === 'admin' && user.status === 'approved';
+  if (filter === 'watcher') return user.role === 'watcher' && user.status === 'approved';
+  if (filter === 'editor') return user.role === 'editor' && user.status === 'approved';
   return true;
 }
 
 function buildUserActions(u, currentUserId) {
   const isSelf = u.id === currentUserId;
-  const actions = [];
+  const actions = [
+    `<button type="button" class="tb-btn tb-btn-primary" data-action="edit" data-id="${u.id}">Modifica</button>`,
+  ];
 
   if (u.status === 'pending') {
-    actions.push(`<button type="button" class="tb-btn tb-btn-success" data-action="approve" data-id="${u.id}">Approva accesso</button>`);
+    actions.push(`<button type="button" class="tb-btn tb-btn-success" data-action="approve" data-id="${u.id}">Approva</button>`);
     actions.push(`<button type="button" class="tb-btn tb-btn-danger" data-action="deny" data-id="${u.id}">Nega</button>`);
-  } else if (u.status === 'approved') {
-    actions.push(`<button type="button" class="tb-btn tb-btn-danger" data-action="deny" data-id="${u.id}" ${isSelf ? 'disabled title="Non puoi rimuovere il tuo accesso"' : ''}>Rimuovi accesso</button>`);
+  } else if (u.status === 'approved' && !isSelf) {
+    actions.push(`<button type="button" class="tb-btn tb-btn-danger" data-action="deny" data-id="${u.id}">Rimuovi accesso</button>`);
   } else if (u.status === 'denied') {
-    actions.push(`<button type="button" class="tb-btn tb-btn-primary" data-action="approve" data-id="${u.id}">Ripristina accesso</button>`);
-  }
-
-  if (u.status === 'approved' && u.role !== 'admin') {
-    actions.push(`<button type="button" class="tb-btn tb-btn-soft" data-action="admin" data-id="${u.id}">Promuovi admin</button>`);
-  } else if (u.role === 'admin' && !isSelf) {
-    actions.push(`<button type="button" class="tb-btn tb-btn-soft" data-action="demote" data-id="${u.id}">Togli ruolo admin</button>`);
-  } else if (u.status === 'pending' && u.role !== 'admin') {
-    actions.push(`<button type="button" class="tb-btn tb-btn-soft" data-action="admin" data-id="${u.id}">Approva come admin</button>`);
+    actions.push(`<button type="button" class="tb-btn tb-btn-soft" data-action="approve" data-id="${u.id}">Ripristina</button>`);
   }
 
   return actions;
+}
+
+function openEditUserModal(user, onSaved) {
+  const isSelf = user.id === state.user.id;
+  const backdrop = document.createElement('div');
+  backdrop.className = 'modal-backdrop modal-backdrop-top';
+  backdrop.innerHTML = `
+    <div class="modal admin-edit-modal">
+      <h3>Modifica utente</h3>
+      <p class="admin-edit-sub">@${escapeHtml(user.username)}${isSelf ? ' <span class="admin-you">(tu)</span>' : ''}</p>
+      <form id="edit-user-form" class="admin-create-form">
+        <div class="admin-create-grid">
+          <div>
+            <label>Nome visualizzato</label>
+            <input name="name" required maxlength="64" value="${escapeHtml(user.name)}">
+          </div>
+          <div>
+            <label>Ruolo</label>
+            <select name="role">
+              <option value="editor" ${user.role === 'editor' ? 'selected' : ''}>Editor</option>
+              <option value="watcher" ${user.role === 'watcher' ? 'selected' : ''}>Watcher (solo lettura)</option>
+              <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Amministratore</option>
+            </select>
+          </div>
+          <div>
+            <label>Accesso al sito</label>
+            <select name="status" ${isSelf ? 'disabled' : ''}>
+              <option value="approved" ${user.status === 'approved' ? 'selected' : ''}>Approvato</option>
+              <option value="pending" ${user.status === 'pending' ? 'selected' : ''}>In attesa</option>
+              <option value="denied" ${user.status === 'denied' ? 'selected' : ''}>Negato</option>
+            </select>
+          </div>
+          <div>
+            <label>Nuova password</label>
+            <input name="password" type="password" minlength="6" placeholder="Lascia vuoto per non cambiare" autocomplete="new-password">
+          </div>
+        </div>
+        <label class="admin-check">
+          <input type="checkbox" name="permanent" ${user.permanent ? 'checked' : ''}>
+          Segna come utente permanente
+        </label>
+        <div class="modal-actions">
+          <button type="button" class="tb-btn tb-btn-soft" id="edit-cancel">Annulla</button>
+          <button type="submit" class="tb-btn tb-btn-primary">Salva modifiche</button>
+        </div>
+      </form>
+    </div>`;
+
+  document.body.appendChild(backdrop);
+
+  const close = () => backdrop.remove();
+
+  backdrop.querySelector('#edit-cancel').onclick = close;
+  backdrop.addEventListener('click', (ev) => {
+    if (ev.target === backdrop) close();
+  });
+
+  backdrop.querySelector('#edit-user-form').onsubmit = async (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const body = {
+      name: fd.get('name'),
+      role: fd.get('role'),
+      status: isSelf ? user.status : fd.get('status'),
+      permanent: fd.get('permanent') === 'on',
+    };
+    const password = String(fd.get('password') || '');
+    if (password) body.password = password;
+
+    try {
+      await patchUser(user.id, body);
+      toast('Utente aggiornato');
+      close();
+      onSaved?.();
+    } catch (err) {
+      toast(err.message || 'Errore salvataggio');
+    }
+  };
 }
 
 async function openAdminPanel(filter) {
@@ -731,6 +836,8 @@ async function openAdminPanel(filter) {
     total: users.length,
     active: users.filter((u) => u.status === 'approved').length,
     admins: users.filter((u) => u.role === 'admin' && u.status === 'approved').length,
+    editors: users.filter((u) => u.role === 'editor' && u.status === 'approved').length,
+    watchers: users.filter((u) => u.role === 'watcher' && u.status === 'approved').length,
     pending: users.filter((u) => u.status === 'pending').length,
     blocked: users.filter((u) => u.status === 'denied').length,
   };
@@ -746,7 +853,7 @@ async function openAdminPanel(filter) {
       return `
         <tr class="admin-row admin-row-${u.status}">
           <td>
-            <div class="admin-user-name">${escapeHtml(u.name)}${you}</div>
+            <div class="admin-user-name">${escapeHtml(u.name)}${you}${u.permanent ? ' <span class="admin-permanent">permanente</span>' : ''}</div>
             <div class="admin-user-handle">@${escapeHtml(u.username)}</div>
           </td>
           <td>
@@ -754,7 +861,7 @@ async function openAdminPanel(filter) {
             <div class="admin-access-sub">${access.sub}</div>
           </td>
           <td>
-            <span class="role-badge role-${u.role}">${u.role === 'admin' ? 'Admin' : 'Editor'}</span>
+            <span class="role-badge role-${u.role}">${roleLabel(u.role)}</span>
           </td>
           <td class="admin-date">${formatDate(u.createdAt)}</td>
           <td class="admin-actions">${actions.join('') || '<span class="admin-no-action">—</span>'}</td>
@@ -765,7 +872,9 @@ async function openAdminPanel(filter) {
   const filters = [
     { id: 'all', label: 'Tutti', count: stats.total },
     { id: 'active', label: 'Con accesso', count: stats.active },
-    { id: 'admin', label: 'Admin', count: stats.admins },
+    { id: 'admin', label: 'Amministratori', count: stats.admins },
+    { id: 'editor', label: 'Editor', count: stats.editors },
+    { id: 'watcher', label: 'Watcher', count: stats.watchers },
     { id: 'pending', label: 'In attesa', count: stats.pending },
     { id: 'blocked', label: 'Senza accesso', count: stats.blocked },
   ];
@@ -777,9 +886,18 @@ async function openAdminPanel(filter) {
     )
     .join('');
 
-  const storageWarning = meta.ephemeral
-    ? `<div class="admin-warning">Attenzione: il database su Render non è persistente. Gli utenti registrati possono sparire dopo un riavvio. Configura Turso per salvare tutti gli account in modo permanente.</div>`
-    : '';
+  let storageNotice = '';
+  if (meta.ephemeral) {
+    storageNotice = `<div class="admin-warning">
+      Su Render gli utenti possono sparire al riavvio del server.
+      Dopo aver modificato un account, usa <strong>Esporta JSON</strong> e incolla il risultato in
+      <code>PERSISTENT_USERS</code> su Render, oppure configura <code>GITHUB_TOKEN</code> per salvare automaticamente.
+    </div>`;
+  } else if (meta.hasGithub) {
+    storageNotice = `<div class="admin-info">Salvataggio persistente attivo via GitHub.</div>`;
+  } else if (meta.hasEnvUsers) {
+    storageNotice = `<div class="admin-info">Utenti permanenti caricati da PERSISTENT_USERS.</div>`;
+  }
 
   const backdrop = document.createElement('div');
   backdrop.className = 'modal-backdrop';
@@ -787,10 +905,10 @@ async function openAdminPanel(filter) {
     <div class="modal admin-modal">
       <h3>Gestione accessi</h3>
       <p class="admin-intro">
-        Elenco completo degli account registrati (${meta.total ?? users.length} totali).
-        Da qui puoi vedere chi può entrare, chi è admin e rimuovere l'accesso.
+        Elenco completo degli account (${meta.total ?? users.length} totali).
+        Clicca <strong>Modifica</strong> per cambiare nome, ruolo, accesso o password.
       </p>
-      ${storageWarning}
+      ${storageNotice}
 
       <div class="admin-stats">
         <div class="admin-stat">
@@ -829,6 +947,7 @@ async function openAdminPanel(filter) {
       </div>
 
       <div class="modal-actions">
+        <button type="button" class="tb-btn tb-btn-soft" id="btn-export-users">Esporta JSON</button>
         <button type="button" class="tb-btn tb-btn-soft" id="modal-cancel">Chiudi</button>
       </div>
     </div>`;
@@ -836,6 +955,16 @@ async function openAdminPanel(filter) {
   state.modal = backdrop;
 
   backdrop.querySelector('#modal-cancel').onclick = closeModal;
+  backdrop.querySelector('#btn-export-users').onclick = async () => {
+    try {
+      const res = await fetch('/api/admin/users/export', { credentials: 'include' });
+      const text = await res.text();
+      await navigator.clipboard.writeText(text);
+      toast('JSON copiato — incollalo in PERSISTENT_USERS su Render');
+    } catch {
+      toast('Errore export');
+    }
+  };
   backdrop.addEventListener('click', (ev) => {
     if (ev.target === backdrop) closeModal();
   });
@@ -858,12 +987,16 @@ async function openAdminPanel(filter) {
 
       btn.disabled = true;
       try {
+        if (action === 'edit') {
+          const u = users.find((x) => x.id === id);
+          if (u) openEditUserModal(u, () => openAdminPanel(state.adminFilter));
+          btn.disabled = false;
+          return;
+        }
         if (action === 'approve') await patchUser(id, { status: 'approved' });
         else if (action === 'deny') await patchUser(id, { status: 'denied' });
-        else if (action === 'admin') await patchUser(id, { role: 'admin', status: 'approved' });
-        else if (action === 'demote') await patchUser(id, { role: 'editor' });
         toast('Utente aggiornato');
-        openAdminPanel();
+        openAdminPanel(state.adminFilter);
       } catch (err) {
         toast(err.message || 'Errore aggiornamento');
         btn.disabled = false;

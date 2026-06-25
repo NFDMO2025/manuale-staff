@@ -2,21 +2,19 @@ require('dotenv').config();
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const path = require('path');
+const { initDb, getStorageInfo, getManual, saveManual, resetManual } = require('./db');
 const {
-  initDb,
-  getStorageMode,
+  initUsers,
   createUser,
   findUserWithPassword,
   findUserByUsername,
   countUsers,
   listUsers,
-  updateUserAccess,
+  updateUser,
   findUserById,
-  getManual,
-  saveManual,
-  resetManual,
   countAdmins,
-} = require('./db');
+  exportPersistentUsersJson,
+} = require('./users');
 const {
   isAdminUsername,
   hashPassword,
@@ -24,7 +22,9 @@ const {
   signSession,
   authMiddleware,
   requireApproved,
+  requireEditor,
   requireAdmin,
+  normalizeRole,
   setSessionCookie,
   clearSessionCookie,
   validateUsername,
@@ -58,6 +58,7 @@ async function ensureDefaultAdmin() {
     name: process.env.ADMIN_NAME || 'Admin',
     status: 'approved',
     role: 'admin',
+    permanent: true,
   });
   console.log(`Account admin creato: ${username}`);
 }
@@ -69,6 +70,7 @@ function publicUser(user) {
     name: user.name,
     status: user.status,
     role: user.role,
+    permanent: user.permanent,
     createdAt: user.createdAt,
   };
 }
@@ -106,7 +108,7 @@ app.post('/api/auth/register', async (req, res) => {
 
     const { status, role } = await resolveNewUserRole(username);
     const passwordHash = await hashPassword(password);
-    const user = await createUser({ username, passwordHash, name, status, role });
+    const user = await createUser({ username, passwordHash, name, status, role, permanent: false });
 
     const token = signSession(user);
     setSessionCookie(res, token);
@@ -164,7 +166,7 @@ app.get('/api/manual', requireApproved, async (_req, res) => {
   res.json(await getManual());
 });
 
-app.put('/api/manual', requireApproved, async (req, res) => {
+app.put('/api/manual', requireEditor, async (req, res) => {
   if (!req.body?.data) {
     return res.status(400).json({ error: 'Dati manuale mancanti' });
   }
@@ -180,56 +182,121 @@ app.post('/api/manual/reset', requireAdmin, async (req, res) => {
 
 app.get('/api/admin/users', requireAdmin, async (_req, res) => {
   const users = await listUsers();
-  const storage = getStorageMode();
+  const storage = getStorageInfo();
   res.json({
     users,
     meta: {
-      storage,
+      storage: storage.mode,
+      storageLabel: storage.label,
+      ephemeral: storage.ephemeral,
       total: users.length,
-      ephemeral: storage === 'sqlite' && process.env.NODE_ENV === 'production',
+      hasGithub: Boolean(process.env.GITHUB_TOKEN),
+      hasEnvUsers: Boolean(process.env.PERSISTENT_USERS || process.env.STAFF_USERS),
     },
   });
 });
 
+app.post('/api/admin/users', requireAdmin, async (req, res) => {
+  try {
+    const username = String(req.body.username || '').trim();
+    const password = String(req.body.password || '');
+    const name = String(req.body.name || '').trim();
+    const role = normalizeRole(req.body.role) || 'editor';
+    const status = req.body.status === 'pending' ? 'pending' : 'approved';
+    const permanent = req.body.permanent !== false;
+
+    const userErr = validateUsername(username);
+    if (userErr) return res.status(400).json({ error: userErr });
+    const passErr = validatePassword(password);
+    if (passErr) return res.status(400).json({ error: passErr });
+    const nameErr = validateName(name);
+    if (nameErr) return res.status(400).json({ error: nameErr });
+
+    if (await findUserByUsername(username)) {
+      return res.status(409).json({ error: 'Username già in uso' });
+    }
+
+    const passwordHash = await hashPassword(password);
+    const user = await createUser({
+      username,
+      passwordHash,
+      name,
+      status,
+      role,
+      permanent,
+    });
+
+    res.status(201).json({ user: publicUser(user) });
+  } catch (err) {
+    res.status(400).json({ error: err.message || 'Creazione utente fallita' });
+  }
+});
+
+app.get('/api/admin/users/export', requireAdmin, (_req, res) => {
+  res.type('application/json').send(exportPersistentUsersJson());
+});
+
 app.patch('/api/admin/users/:id', requireAdmin, async (req, res) => {
   const id = parseInt(req.params.id, 10);
-  const { status, role } = req.body;
+  const { status, role, permanent, name, password } = req.body;
 
   const target = await findUserById(id);
   if (!target) {
     return res.status(404).json({ error: 'Utente non trovato' });
   }
 
+  if (name !== undefined) {
+    const nameErr = validateName(name);
+    if (nameErr) return res.status(400).json({ error: nameErr });
+  }
+
+  if (password) {
+    const passErr = validatePassword(password);
+    if (passErr) return res.status(400).json({ error: passErr });
+  }
+
   if (target.role === 'admin' && status === 'denied' && target.id === req.user.id) {
     return res.status(400).json({ error: 'Non puoi negare l\'accesso a te stesso' });
   }
 
-  if (role === 'editor' && target.role === 'admin' && target.id === req.user.id) {
+  const demotingAdmin = role && role !== 'admin' && target.role === 'admin';
+  if (demotingAdmin && target.id === req.user.id) {
     return res.status(400).json({ error: 'Non puoi rimuovere il tuo ruolo admin' });
   }
 
-  if (role === 'editor' && target.role === 'admin' && (await countAdmins()) <= 1) {
+  if (demotingAdmin && (await countAdmins()) <= 1) {
     return res.status(400).json({ error: 'Deve restare almeno un amministratore' });
   }
 
   let newStatus = status ?? target.status;
   let newRole = role ?? target.role;
 
+  if (role && !normalizeRole(role)) {
+    return res.status(400).json({ error: 'Ruolo non valido' });
+  }
+
   if (role === 'admin') {
     newRole = 'admin';
     newStatus = 'approved';
   }
 
-  const updated = await updateUserAccess(id, {
+  let passwordHash;
+  if (password) {
+    passwordHash = await hashPassword(password);
+  }
+
+  const updated = await updateUser(id, {
     status: newStatus,
     role: newRole,
+    permanent: permanent === true ? true : permanent === false ? false : undefined,
+    name: name !== undefined ? String(name).trim() : undefined,
+    passwordHash,
   });
 
-  res.json(updated);
+  res.json(publicUser(updated));
 });
 
 app.use(express.static(path.join(__dirname, '..', 'public'), {
-  maxAge: process.env.NODE_ENV === 'production' ? '1h' : 0,
   setHeaders(res, filePath) {
     if (filePath.endsWith('.js') || filePath.endsWith('.css')) {
       res.setHeader('Cache-Control', 'no-cache');
@@ -243,11 +310,14 @@ app.get('*', (_req, res) => {
 
 async function start() {
   await initDb();
+  await initUsers();
   await ensureDefaultAdmin();
+
+  const storage = getStorageInfo();
+  console.log(`Storage: ${storage.label}`);
 
   app.listen(PORT, () => {
     console.log(`Manuale Staff -> http://localhost:${PORT}`);
-    console.log(`Database: ${getStorageMode()}`);
     console.log(`Admin: ${process.env.ADMIN_USERNAME || '(primo registrato)'}`);
   });
 }
