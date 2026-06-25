@@ -41,7 +41,7 @@ async function saveData() {
       method: 'PUT',
       body: JSON.stringify({ data: state.data }),
     });
-    toast(`Salvato sul server ✓ (${result.updatedBy || 'tu'})`);
+    toast(`Salvato sul server (${result.updatedBy || 'tu'})`);
   } catch (err) {
     toast(err.message || 'Errore salvataggio');
   } finally {
@@ -111,7 +111,7 @@ function renderLegend() {
     .map(
       (leg, i) => `
       <div class="leg leg-${leg.type}" data-legend="${i}">
-        <button type="button" class="mini-btn danger item-del edit-only" data-del-legend="${i}">✕</button>
+        <button type="button" class="mini-btn danger item-del edit-only" data-del-legend="${i}" title="Elimina">X</button>
         <div class="leg-label editable" data-edit="legend-label-${i}">${escapeHtml(leg.label)}</div>
         <div class="leg-desc editable" data-edit="legend-desc-${i}">${escapeHtml(leg.desc)}</div>
       </div>`
@@ -134,7 +134,7 @@ function renderRuleRow(rule, si, ri, q) {
       <td data-label="Recidiva"><span class="rec-text editable" data-edit="rule-recidiva-${si}-${ri}">${escapeHtml(rule.recidiva)}</span></td>
       <td class="edit-only row-actions" data-label="">
         <button type="button" class="mini-btn" data-edit-rule="${si}-${ri}">Modifica</button>
-        <button type="button" class="mini-btn danger" data-del-rule="${si}-${ri}">✕</button>
+        <button type="button" class="mini-btn danger" data-del-rule="${si}-${ri}" title="Elimina">X</button>
       </td>
     </tr>`;
 }
@@ -148,7 +148,7 @@ function renderSection(section, si, q) {
     .map(
       (a, ai) => `
       <div class="alert alert-${a.type}" data-alert="${si}-${ai}">
-        <button type="button" class="mini-btn danger item-del edit-only" data-del-alert="${si}-${ai}">✕</button>
+        <button type="button" class="mini-btn danger item-del edit-only" data-del-alert="${si}-${ai}" title="Elimina">X</button>
         <div class="alert-title editable" data-edit="alert-title-${si}-${ai}">${escapeHtml(a.title)}</div>
         <div class="alert-body editable" data-edit="alert-body-${si}-${ai}">${escapeHtml(a.body)}</div>
       </div>`
@@ -185,14 +185,14 @@ function renderChecklist() {
       <div class="check-row" data-check="${i}">
         <div class="check-n">${i + 1}</div>
         <div class="check-t editable" data-edit="check-${i}">${escapeHtml(text)}</div>
-        <button type="button" class="mini-btn danger item-del edit-only" data-del-check="${i}">✕</button>
+        <button type="button" class="mini-btn danger item-del edit-only" data-del-check="${i}" title="Elimina">X</button>
       </div>`
     )
     .join('');
   return `
     <div class="section">
       <div class="section-head">
-        <div class="section-num">✓</div>
+        <div class="section-num section-num-check">CL</div>
         <div class="section-title editable" data-edit="checklist-title">Checklist prima di sanzionare</div>
         <div class="section-line"></div>
       </div>
@@ -461,7 +461,7 @@ function toggleEdit() {
   document.body.classList.toggle('editing', state.editing);
   document.getElementById('toolbar').classList.toggle('editing', state.editing);
   document.getElementById('btn-save').classList.toggle('hidden', !state.editing);
-  document.getElementById('btn-edit').textContent = state.editing ? '✓ Fine modifica' : '✏️ Modifica';
+  document.getElementById('btn-edit').textContent = state.editing ? 'Fine modifica' : 'Modifica';
   render();
 }
 
@@ -482,7 +482,7 @@ async function importJson(file) {
       state.data = JSON.parse(reader.result);
       await saveData();
       render();
-      toast('Import completato ✓');
+      toast('Import completato');
     } catch {
       toast('File JSON non valido');
     }
@@ -703,7 +703,7 @@ async function openAdminPanel() {
         <tr>
           <td>${escapeHtml(u.name)}<br><span style="color:var(--muted);font-size:11px">@${escapeHtml(u.username)}</span></td>
           <td><span class="status-pill ${statusClass(u.status)}">${statusLabel(u.status)}</span></td>
-          <td>${u.role === 'admin' ? '👑 Admin' : 'Editor'}</td>
+          <td>${u.role === 'admin' ? 'Admin' : 'Editor'}</td>
           <td class="admin-actions">${actions.join('') || '—'}</td>
         </tr>`;
     })
@@ -743,7 +743,7 @@ async function openAdminPanel() {
         else if (action === 'deny') await patchUser(id, { status: 'denied' });
         else if (action === 'admin') await patchUser(id, { role: 'admin', status: 'approved' });
         else if (action === 'demote') await patchUser(id, { role: 'editor' });
-        toast('Utente aggiornato ✓');
+        toast('Utente aggiornato');
         closeModal();
         openAdminPanel();
       } catch (err) {

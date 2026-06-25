@@ -120,7 +120,7 @@ body.auth-mode { padding-top: 0; }
   border-top: 1px solid rgba(255,255,255,.06);
 }
 
-.login-side-list li::before { content: '→ '; color: var(--tech); }
+.login-side-list li::before { content: '- '; color: var(--tech); font-weight: 600; }
 
 .login-card {
   background: var(--surface-raised);
@@ -413,7 +413,11 @@ body.auth-mode { padding-top: 0; }
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22px;
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--accent);
   flex-shrink: 0;
   border: 2px solid var(--accent);
 }
@@ -589,6 +593,8 @@ body.auth-mode { padding-top: 0; }
 .pill-b { background: #eff6ff; color: #1d4ed8; border-color: #93c5fd; }
 .pill-gray { background: #f4f4f5; color: #52525b; border-color: #d4d4d8; }
 .pill-perm { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+.section-num-check { font-size: 10px; letter-spacing: 0.06em; }
 
 .rec-text { font-size: 12px; color: var(--muted); line-height: 1.5; font-style: italic; }
 

@@ -1,6 +1,6 @@
 window.DEFAULT_MANUAL = {
   header: {
-    icon: '⚖️',
+    icon: 'MS',
     title: 'Manuale Sanzioni Staff',
     subtitle: 'Pannello operativo — uso interno riservato',
     stamp: 'USO RISERVATO',
