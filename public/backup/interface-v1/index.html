@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manuale Sanzioni Staff</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div id="auth-screen" class="login-screen hidden">
+    <div class="login-card auth-card">
+      <div class="login-logo">⚖️</div>
+      <h1>Manuale Sanzioni Staff</h1>
+      <p class="login-subtitle" id="auth-message">Accedi o registrati per continuare</p>
+
+      <div id="auth-forms">
+        <div class="auth-tabs">
+          <button type="button" class="auth-tab active" data-tab="login">Accedi</button>
+          <button type="button" class="auth-tab" data-tab="register">Registrati</button>
+        </div>
+
+        <form id="form-login" class="auth-form" autocomplete="on">
+          <label for="login-username">Username</label>
+          <input type="text" id="login-username" name="username" required autocomplete="username">
+          <label for="login-password">Password</label>
+          <input type="password" id="login-password" name="password" required autocomplete="current-password">
+          <button type="submit" class="btn btn-primary btn-block">Accedi</button>
+        </form>
+
+        <form id="form-register" class="auth-form hidden" autocomplete="on">
+          <label for="reg-name">Nome visualizzato</label>
+          <input type="text" id="reg-name" name="name" required placeholder="Es. Mario Rossi" autocomplete="name">
+          <label for="reg-username">Username</label>
+          <input type="text" id="reg-username" name="username" required pattern="[a-zA-Z0-9_]{3,32}" autocomplete="username">
+          <label for="reg-password">Password</label>
+          <input type="password" id="reg-password" name="password" required minlength="6" autocomplete="new-password">
+          <p class="auth-hint">Dopo la registrazione un admin deve approvare il tuo accesso.</p>
+          <button type="submit" class="btn btn-primary btn-block">Crea account</button>
+        </form>
+      </div>
+
+      <div id="auth-user-pending" class="hidden">
+        <div class="auth-pending-box">
+          <p>⏳ Il tuo account è <strong>in attesa di approvazione</strong>.</p>
+          <p class="auth-email" id="pending-username"></p>
+          <p class="auth-hint">Un admin deve approvare il tuo accesso.</p>
+        </div>
+        <button type="button" class="btn btn-ghost btn-block" id="btn-check-pending">Controlla di nuovo</button>
+        <button type="button" class="btn btn-ghost btn-block" id="btn-logout-pending">Esci</button>
+      </div>
+
+      <div id="auth-user-denied" class="hidden">
+        <div class="auth-denied-box">
+          <p>🚫 Accesso <strong>negato</strong>.</p>
+          <p class="auth-email" id="denied-username"></p>
+          <p class="auth-hint">Contatta un amministratore se pensi sia un errore.</p>
+        </div>
+        <button type="button" class="btn btn-ghost btn-block" id="btn-logout-denied">Esci</button>
+      </div>
+
+      <p id="auth-error" class="login-error hidden"></p>
+    </div>
+  </div>
+
+  <div id="main-app" class="hidden">
+    <header class="toolbar" id="toolbar">
+      <span class="toolbar-title">⚖️ Manuale Sanzioni Staff</span>
+      <input type="search" class="toolbar-search" id="search-input" placeholder="Cerca regola, sanzione...">
+      <button type="button" class="tb-btn tb-btn-ghost hidden" id="btn-admin">👥 Accessi</button>
+      <button type="button" class="tb-btn tb-btn-ghost tb-btn-edit" id="btn-edit">✏️ Modifica</button>
+      <button type="button" class="tb-btn tb-btn-success hidden" id="btn-save">💾 Salva</button>
+      <button type="button" class="tb-btn tb-btn-ghost" id="btn-export">Esporta</button>
+      <button type="button" class="tb-btn tb-btn-ghost" id="btn-import">Importa</button>
+      <button type="button" class="tb-btn tb-btn-ghost" id="btn-reset">Ripristina</button>
+      <div class="user-chip" id="user-chip"></div>
+      <button type="button" class="tb-btn tb-btn-ghost" id="btn-logout">Esci</button>
+      <input type="file" id="import-file" accept=".json" class="hidden">
+    </header>
+
+    <main class="page" id="app-root"></main>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="js/default-data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
