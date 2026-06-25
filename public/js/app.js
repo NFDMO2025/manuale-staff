@@ -6,6 +6,7 @@ const state = {
   user: null,
   saving: false,
   authTab: 'login',
+  adminFilter: 'all',
 };
 
 async function api(path, options = {}) {
@@ -651,18 +652,6 @@ async function applyUserState() {
   setAuthView('denied');
 }
 
-function statusLabel(status) {
-  if (status === 'approved') return 'Approvato';
-  if (status === 'denied') return 'Negato';
-  return 'In attesa';
-}
-
-function statusClass(status) {
-  if (status === 'approved') return 'status-approved';
-  if (status === 'denied') return 'status-denied';
-  return 'status-pending';
-}
-
 async function patchUser(id, body) {
   return api(`/api/admin/users/${id}`, {
     method: 'PATCH',
@@ -670,7 +659,62 @@ async function patchUser(id, body) {
   });
 }
 
-async function openAdminPanel() {
+function formatDate(ts) {
+  if (!ts) return '—';
+  return new Date(ts).toLocaleDateString('it-IT', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
+}
+
+function accessSummary(user) {
+  if (user.status === 'approved') {
+    return user.role === 'admin'
+      ? { label: 'Accesso attivo', sub: 'Amministratore', class: 'access-full' }
+      : { label: 'Accesso attivo', sub: 'Editor', class: 'access-yes' };
+  }
+  if (user.status === 'pending') {
+    return { label: 'In attesa', sub: 'Non ancora approvato', class: 'access-pending' };
+  }
+  return { label: 'Nessun accesso', sub: 'Account bloccato', class: 'access-no' };
+}
+
+function userMatchesFilter(user, filter) {
+  if (filter === 'all') return true;
+  if (filter === 'active') return user.status === 'approved';
+  if (filter === 'pending') return user.status === 'pending';
+  if (filter === 'blocked') return user.status === 'denied';
+  if (filter === 'admin') return user.role === 'admin' && user.status === 'approved';
+  return true;
+}
+
+function buildUserActions(u, currentUserId) {
+  const isSelf = u.id === currentUserId;
+  const actions = [];
+
+  if (u.status === 'pending') {
+    actions.push(`<button type="button" class="tb-btn tb-btn-success" data-action="approve" data-id="${u.id}">Approva accesso</button>`);
+    actions.push(`<button type="button" class="tb-btn tb-btn-danger" data-action="deny" data-id="${u.id}">Nega</button>`);
+  } else if (u.status === 'approved') {
+    actions.push(`<button type="button" class="tb-btn tb-btn-danger" data-action="deny" data-id="${u.id}" ${isSelf ? 'disabled title="Non puoi rimuovere il tuo accesso"' : ''}>Rimuovi accesso</button>`);
+  } else if (u.status === 'denied') {
+    actions.push(`<button type="button" class="tb-btn tb-btn-primary" data-action="approve" data-id="${u.id}">Ripristina accesso</button>`);
+  }
+
+  if (u.status === 'approved' && u.role !== 'admin') {
+    actions.push(`<button type="button" class="tb-btn tb-btn-soft" data-action="admin" data-id="${u.id}">Promuovi admin</button>`);
+  } else if (u.role === 'admin' && !isSelf) {
+    actions.push(`<button type="button" class="tb-btn tb-btn-soft" data-action="demote" data-id="${u.id}">Togli ruolo admin</button>`);
+  } else if (u.status === 'pending' && u.role !== 'admin') {
+    actions.push(`<button type="button" class="tb-btn tb-btn-soft" data-action="admin" data-id="${u.id}">Approva come admin</button>`);
+  }
+
+  return actions;
+}
+
+async function openAdminPanel(filter) {
+  if (filter) state.adminFilter = filter;
   closeModal();
   let users;
   try {
@@ -680,49 +724,104 @@ async function openAdminPanel() {
     return;
   }
 
-  const rows = users
-    .map((u) => {
-      const isSelf = u.id === state.user.id;
-      const actions = [];
+  const stats = {
+    total: users.length,
+    active: users.filter((u) => u.status === 'approved').length,
+    admins: users.filter((u) => u.role === 'admin' && u.status === 'approved').length,
+    pending: users.filter((u) => u.status === 'pending').length,
+    blocked: users.filter((u) => u.status === 'denied').length,
+  };
 
-      if (u.status === 'pending') {
-        actions.push(`<button type="button" class="tb-btn tb-btn-success" data-action="approve" data-id="${u.id}">Approva</button>`);
-        actions.push(`<button type="button" class="tb-btn tb-btn-danger" data-action="deny" data-id="${u.id}">Nega</button>`);
-      } else if (u.status === 'approved') {
-        actions.push(`<button type="button" class="tb-btn tb-btn-danger" data-action="deny" data-id="${u.id}" ${isSelf ? 'disabled' : ''}>Revoca</button>`);
-      } else if (u.status === 'denied') {
-        actions.push(`<button type="button" class="tb-btn tb-btn-primary" data-action="approve" data-id="${u.id}">Riapprova</button>`);
-      }
-      if (u.role !== 'admin') {
-        actions.push(`<button type="button" class="tb-btn tb-btn-primary" data-action="admin" data-id="${u.id}">Promuovi admin</button>`);
-      } else if (!isSelf) {
-        actions.push(`<button type="button" class="tb-btn tb-btn-ghost" data-action="demote" data-id="${u.id}">Rimuovi admin</button>`);
-      }
+  const filtered = users.filter((u) => userMatchesFilter(u, state.adminFilter));
+
+  const rows = filtered
+    .map((u) => {
+      const access = accessSummary(u);
+      const actions = buildUserActions(u, state.user.id);
+      const you = u.id === state.user.id ? ' <span class="admin-you">(tu)</span>' : '';
 
       return `
-        <tr>
-          <td>${escapeHtml(u.name)}<br><span style="color:var(--muted);font-size:11px">@${escapeHtml(u.username)}</span></td>
-          <td><span class="status-pill ${statusClass(u.status)}">${statusLabel(u.status)}</span></td>
-          <td>${u.role === 'admin' ? 'Admin' : 'Editor'}</td>
-          <td class="admin-actions">${actions.join('') || '—'}</td>
+        <tr class="admin-row admin-row-${u.status}">
+          <td>
+            <div class="admin-user-name">${escapeHtml(u.name)}${you}</div>
+            <div class="admin-user-handle">@${escapeHtml(u.username)}</div>
+          </td>
+          <td>
+            <span class="access-badge ${access.class}">${access.label}</span>
+            <div class="admin-access-sub">${access.sub}</div>
+          </td>
+          <td>
+            <span class="role-badge role-${u.role}">${u.role === 'admin' ? 'Admin' : 'Editor'}</span>
+          </td>
+          <td class="admin-date">${formatDate(u.createdAt)}</td>
+          <td class="admin-actions">${actions.join('') || '<span class="admin-no-action">—</span>'}</td>
         </tr>`;
     })
+    .join('');
+
+  const filters = [
+    { id: 'all', label: 'Tutti', count: stats.total },
+    { id: 'active', label: 'Con accesso', count: stats.active },
+    { id: 'admin', label: 'Admin', count: stats.admins },
+    { id: 'pending', label: 'In attesa', count: stats.pending },
+    { id: 'blocked', label: 'Senza accesso', count: stats.blocked },
+  ];
+
+  const filterHtml = filters
+    .map(
+      (f) =>
+        `<button type="button" class="admin-filter-btn ${state.adminFilter === f.id ? 'active' : ''}" data-filter="${f.id}">${f.label} <span class="admin-filter-count">${f.count}</span></button>`
+    )
     .join('');
 
   const backdrop = document.createElement('div');
   backdrop.className = 'modal-backdrop';
   backdrop.innerHTML = `
-    <div class="modal" style="max-width:720px">
+    <div class="modal admin-modal">
       <h3>Gestione accessi</h3>
-      <p style="color:var(--muted);font-size:12px;margin-bottom:16px">
-        Approva, nega o promuovi altri utenti ad amministratore.
+      <p class="admin-intro">
+        Elenco completo degli account registrati. Da qui puoi vedere chi può entrare nel manuale,
+        chi è amministratore e rimuovere l'accesso a chi non deve più usarlo.
       </p>
-      <table class="admin-table">
-        <thead><tr><th>Utente</th><th>Stato</th><th>Ruolo</th><th>Azioni</th></tr></thead>
-        <tbody>${rows || '<tr><td colspan="4">Nessun utente</td></tr>'}</tbody>
-      </table>
+
+      <div class="admin-stats">
+        <div class="admin-stat">
+          <span class="admin-stat-num">${stats.active}</span>
+          <span class="admin-stat-label">Con accesso</span>
+        </div>
+        <div class="admin-stat">
+          <span class="admin-stat-num">${stats.admins}</span>
+          <span class="admin-stat-label">Amministratori</span>
+        </div>
+        <div class="admin-stat">
+          <span class="admin-stat-num">${stats.pending}</span>
+          <span class="admin-stat-label">In attesa</span>
+        </div>
+        <div class="admin-stat">
+          <span class="admin-stat-num">${stats.blocked}</span>
+          <span class="admin-stat-label">Bloccati</span>
+        </div>
+      </div>
+
+      <div class="admin-filters">${filterHtml}</div>
+
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Utente</th>
+              <th>Accesso al sito</th>
+              <th>Ruolo</th>
+              <th>Registrato</th>
+              <th>Azioni</th>
+            </tr>
+          </thead>
+          <tbody>${rows || `<tr><td colspan="5" class="admin-empty">Nessun utente in questa categoria</td></tr>`}</tbody>
+        </table>
+      </div>
+
       <div class="modal-actions">
-        <button type="button" class="tb-btn tb-btn-ghost" id="modal-cancel">Chiudi</button>
+        <button type="button" class="tb-btn tb-btn-soft" id="modal-cancel">Chiudi</button>
       </div>
     </div>`;
   document.body.appendChild(backdrop);
@@ -733,10 +832,22 @@ async function openAdminPanel() {
     if (ev.target === backdrop) closeModal();
   });
 
+  backdrop.querySelectorAll('[data-filter]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      openAdminPanel(btn.dataset.filter);
+    });
+  });
+
   backdrop.querySelectorAll('[data-action]').forEach((btn) => {
     btn.addEventListener('click', async () => {
       const id = Number(btn.dataset.id);
       const action = btn.dataset.action;
+      const name = users.find((u) => u.id === id)?.name || 'utente';
+
+      if (action === 'deny' && !confirm(`Rimuovere l'accesso a ${name}? Non potrà più usare il manuale.`)) {
+        return;
+      }
+
       btn.disabled = true;
       try {
         if (action === 'approve') await patchUser(id, { status: 'approved' });
@@ -744,7 +855,6 @@ async function openAdminPanel() {
         else if (action === 'admin') await patchUser(id, { role: 'admin', status: 'approved' });
         else if (action === 'demote') await patchUser(id, { role: 'editor' });
         toast('Utente aggiornato');
-        closeModal();
         openAdminPanel();
       } catch (err) {
         toast(err.message || 'Errore aggiornamento');
