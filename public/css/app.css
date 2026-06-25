@@ -461,6 +461,24 @@ body.auth-mode { padding-top: 0; }
 }
 .tb-btn-primary:hover { background: #0d9488; }
 
+.tb-btn-success {
+  background: #16a34a;
+  color: #fff;
+}
+.tb-btn-success:hover { background: #15803d; }
+
+.tb-btn-danger {
+  background: var(--danger);
+  color: #fff;
+}
+.tb-btn-danger:hover { background: #b91c1c; }
+
+.tb-btn-accent {
+  background: var(--accent);
+  color: #fff;
+}
+.tb-btn-accent:hover { background: var(--accent-hover); }
+
 .toolbar.editing .tb-btn-edit {
   background: var(--accent-soft);
   color: var(--accent-hover);
