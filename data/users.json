@@ -39,10 +39,10 @@
       "password_hash": "$2a$10$UfsEV.03Xbfy996SX9/TAepf78XF/ydsh1rocGMRXvFndHY7VxW2O",
       "name": "criroma",
       "status": "approved",
-      "role": "editor",
+      "role": "admin",
       "permanent": false,
       "created_at": 1782432859712,
-      "updated_at": 1782432869403
+      "updated_at": 1782432883648
     }
   ],
   "nextId": 5
