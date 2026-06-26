@@ -65,7 +65,18 @@
       "permanent": false,
       "created_at": 1782475847710,
       "updated_at": 1782476041394
+    },
+    {
+      "id": 7,
+      "username": "frocione",
+      "password_hash": "$2a$10$jgGShb2HiigXxd7xytfDM.90nEP2V0mtwMf.1ZhdwoipGjVUl6Jsm",
+      "name": "Il frocione",
+      "status": "pending",
+      "role": "editor",
+      "permanent": false,
+      "created_at": 1782476960738,
+      "updated_at": 1782476960738
     }
   ],
-  "nextId": 7
+  "nextId": 8
 }
