@@ -38,11 +38,11 @@
       "username": "criroma1900",
       "password_hash": "$2a$10$UfsEV.03Xbfy996SX9/TAepf78XF/ydsh1rocGMRXvFndHY7VxW2O",
       "name": "criroma",
-      "status": "pending",
+      "status": "approved",
       "role": "editor",
       "permanent": false,
       "created_at": 1782432859712,
-      "updated_at": 1782432859712
+      "updated_at": 1782432869403
     }
   ],
   "nextId": 5
