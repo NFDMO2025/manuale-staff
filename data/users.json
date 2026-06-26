@@ -27,11 +27,11 @@
       "username": "waluigi",
       "password_hash": "$2a$10$omcdmw8L99IZG3FX/mz0j.1gnllJf8Svw73bV0LVN8VeEcgu3HC/O",
       "name": "WaLuigi",
-      "status": "pending",
+      "status": "approved",
       "role": "editor",
       "permanent": false,
       "created_at": 1782432601380,
-      "updated_at": 1782432601380
+      "updated_at": 1782432623973
     }
   ],
   "nextId": 4
