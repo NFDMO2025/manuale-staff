@@ -60,11 +60,11 @@
       "username": "pitbull",
       "password_hash": "$2a$10$gG843XIMhNSWnETNtWFzBeSOc.PDrarHXoNp.hafjK.n3IhiyDUJ6",
       "name": "Pitbull",
-      "status": "pending",
+      "status": "approved",
       "role": "editor",
       "permanent": false,
       "created_at": 1782475847710,
-      "updated_at": 1782475847710
+      "updated_at": 1782476041394
     }
   ],
   "nextId": 7
