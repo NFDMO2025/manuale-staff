@@ -17,21 +17,21 @@
       "password_hash": "$2a$10$z3/.YGjkaOYnr8W9RDft2.tZwYkGufWGYa3QP1/tiFNQYLgjLwQRS",
       "name": "loree",
       "status": "approved",
-      "role": "editor",
+      "role": "admin",
       "permanent": false,
       "created_at": 1782432501053,
-      "updated_at": 1782432622912
+      "updated_at": 1782432635027
     },
     {
       "id": 3,
       "username": "waluigi",
       "password_hash": "$2a$10$omcdmw8L99IZG3FX/mz0j.1gnllJf8Svw73bV0LVN8VeEcgu3HC/O",
       "name": "WaLuigi",
-      "status": "approved",
+      "status": "pending",
       "role": "editor",
       "permanent": false,
       "created_at": 1782432601380,
-      "updated_at": 1782432623973
+      "updated_at": 1782432601380
     }
   ],
   "nextId": 4
