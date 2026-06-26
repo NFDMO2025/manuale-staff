@@ -28,10 +28,10 @@
       "password_hash": "$2a$10$omcdmw8L99IZG3FX/mz0j.1gnllJf8Svw73bV0LVN8VeEcgu3HC/O",
       "name": "WaLuigi",
       "status": "approved",
-      "role": "editor",
+      "role": "admin",
       "permanent": false,
       "created_at": 1782432601380,
-      "updated_at": 1782432639899
+      "updated_at": 1782432648413
     }
   ],
   "nextId": 4
