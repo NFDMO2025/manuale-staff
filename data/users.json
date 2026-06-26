@@ -10,7 +10,18 @@
       "permanent": true,
       "created_at": 1782432143510,
       "updated_at": 1782432143510
+    },
+    {
+      "id": 2,
+      "username": "loree",
+      "password_hash": "$2a$10$z3/.YGjkaOYnr8W9RDft2.tZwYkGufWGYa3QP1/tiFNQYLgjLwQRS",
+      "name": "loree",
+      "status": "pending",
+      "role": "editor",
+      "permanent": false,
+      "created_at": 1782432501053,
+      "updated_at": 1782432501053
     }
   ],
-  "nextId": 2
+  "nextId": 3
 }
