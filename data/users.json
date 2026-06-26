@@ -54,7 +54,18 @@
       "permanent": false,
       "created_at": 1782470015792,
       "updated_at": 1782470046815
+    },
+    {
+      "id": 6,
+      "username": "pitbull",
+      "password_hash": "$2a$10$gG843XIMhNSWnETNtWFzBeSOc.PDrarHXoNp.hafjK.n3IhiyDUJ6",
+      "name": "Pitbull",
+      "status": "pending",
+      "role": "editor",
+      "permanent": false,
+      "created_at": 1782475847710,
+      "updated_at": 1782475847710
     }
   ],
-  "nextId": 6
+  "nextId": 7
 }
