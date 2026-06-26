@@ -43,7 +43,18 @@
       "permanent": false,
       "created_at": 1782432859712,
       "updated_at": 1782432883648
+    },
+    {
+      "id": 5,
+      "username": "pit",
+      "password_hash": "$2a$10$MNK3yFTRNc/sH632T5C25eFjFTCr0yMZH32VEGOXwrAwWhp9cQcsm",
+      "name": "Pit",
+      "status": "pending",
+      "role": "editor",
+      "permanent": false,
+      "created_at": 1782470015792,
+      "updated_at": 1782470015792
     }
   ],
-  "nextId": 5
+  "nextId": 6
 }
