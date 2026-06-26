@@ -32,7 +32,18 @@
       "permanent": false,
       "created_at": 1782432601380,
       "updated_at": 1782432648413
+    },
+    {
+      "id": 4,
+      "username": "criroma1900",
+      "password_hash": "$2a$10$UfsEV.03Xbfy996SX9/TAepf78XF/ydsh1rocGMRXvFndHY7VxW2O",
+      "name": "criroma",
+      "status": "pending",
+      "role": "editor",
+      "permanent": false,
+      "created_at": 1782432859712,
+      "updated_at": 1782432859712
     }
   ],
-  "nextId": 4
+  "nextId": 5
 }
