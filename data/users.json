@@ -241,7 +241,18 @@
       "permanent": false,
       "created_at": 1782768090074,
       "updated_at": 1782768090074
+    },
+    {
+      "id": 23,
+      "username": "dimag",
+      "password_hash": "$2a$10$THy51MwU7J7fArScUoxYYe8HDRwBNVzUSQTvtvnZv71K6ZseJjCJC",
+      "name": "dimag",
+      "status": "pending",
+      "role": "editor",
+      "permanent": false,
+      "created_at": 1782769838019,
+      "updated_at": 1782769838019
     }
   ],
-  "nextId": 23
+  "nextId": 24
 }
