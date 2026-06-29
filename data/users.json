@@ -208,7 +208,18 @@
       "permanent": false,
       "created_at": 1782753549077,
       "updated_at": 1782753576809
+    },
+    {
+      "id": 20,
+      "username": "lele",
+      "password_hash": "$2a$10$6yldwE1rmkM3ZQoTTJ8tRuSo37/KppUI0Cr7i7tEJTlaN1I2lxSUG",
+      "name": "Lele",
+      "status": "pending",
+      "role": "editor",
+      "permanent": false,
+      "created_at": 1782754019581,
+      "updated_at": 1782754019581
     }
   ],
-  "nextId": 20
+  "nextId": 21
 }
