@@ -197,7 +197,18 @@
       "permanent": false,
       "created_at": 1782753515522,
       "updated_at": 1782753515522
+    },
+    {
+      "id": 19,
+      "username": "ladymulan",
+      "password_hash": "$2a$10$pqkFYMZo.IxRJ9UXAjqQluH7MivfZ9Qb2D9t0UkvJat0FO3WHjYJy",
+      "name": "Ladymulan",
+      "status": "pending",
+      "role": "editor",
+      "permanent": false,
+      "created_at": 1782753522623,
+      "updated_at": 1782753522623
     }
   ],
-  "nextId": 19
+  "nextId": 20
 }
