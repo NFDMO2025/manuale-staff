@@ -115,22 +115,22 @@
       "username": "nina",
       "password_hash": "$2a$10$CAVvtEn4qXNU1uIPUvNp4.PF7h5Wy1kilDOiKh8vXAJwkMfAL8GLa",
       "name": "Nina",
-      "status": "pending",
+      "status": "approved",
       "role": "editor",
       "permanent": false,
       "created_at": 1782752128941,
-      "updated_at": 1782752128941
+      "updated_at": 1782752626850
     },
     {
       "id": 12,
       "username": "gio",
       "password_hash": "$2a$10$FHX8SZlDLWB8NJdm3k1tSO6oUjAE30rSC1uyjDbIns00x3yPNhdkW",
       "name": "GIORGINO",
-      "status": "approved",
+      "status": "pending",
       "role": "editor",
       "permanent": false,
       "created_at": 1782752130943,
-      "updated_at": 1782752616609
+      "updated_at": 1782752130943
     },
     {
       "id": 13,
