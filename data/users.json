@@ -127,10 +127,10 @@
       "password_hash": "$2a$10$FHX8SZlDLWB8NJdm3k1tSO6oUjAE30rSC1uyjDbIns00x3yPNhdkW",
       "name": "GIORGINO",
       "status": "approved",
-      "role": "editor",
+      "role": "watcher",
       "permanent": false,
       "created_at": 1782752130943,
-      "updated_at": 1782752638426
+      "updated_at": 1782758317718
     },
     {
       "id": 13,
