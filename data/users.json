@@ -137,11 +137,11 @@
       "username": "umberto",
       "password_hash": "$2a$10$04YMaZnNckF1Zoa1okOon.s3jR8zs.nMI1Y.VRnhDXvcEbcnjsLeu",
       "name": "UMBERTO",
-      "status": "pending",
+      "status": "approved",
       "role": "editor",
       "permanent": false,
       "created_at": 1782752140542,
-      "updated_at": 1782752140542
+      "updated_at": 1782752608772
     },
     {
       "id": 14,
