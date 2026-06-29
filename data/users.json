@@ -219,7 +219,18 @@
       "permanent": false,
       "created_at": 1782754019581,
       "updated_at": 1782754529127
+    },
+    {
+      "id": 21,
+      "username": "pumas",
+      "password_hash": "$2a$10$reI7rUJgR/3P2t7S8j0opOYC//wsH3/oDeg284/hwKy5uJ.211rd2",
+      "name": "Pumas",
+      "status": "pending",
+      "role": "editor",
+      "permanent": false,
+      "created_at": 1782754981335,
+      "updated_at": 1782754981335
     }
   ],
-  "nextId": 21
+  "nextId": 22
 }
