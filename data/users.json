@@ -93,11 +93,11 @@
       "username": "mirko",
       "password_hash": "$2a$10$hwX2sUiyWDO6qQCxAVxKXOA4CDESvQB6WcWWVBf6.5dJ3ydY9Ehre",
       "name": "Mirko",
-      "status": "pending",
+      "status": "approved",
       "role": "editor",
       "permanent": false,
       "created_at": 1782752098193,
-      "updated_at": 1782752098193
+      "updated_at": 1782752654856
     },
     {
       "id": 10,
