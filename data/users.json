@@ -142,7 +142,18 @@
       "permanent": false,
       "created_at": 1782752140542,
       "updated_at": 1782752140542
+    },
+    {
+      "id": 14,
+      "username": "king",
+      "password_hash": "$2a$10$d8Udt1iOyEk2AJRzEqrSx.xf3soKexSENLuB.l9TnUEaMcHMQ2ye2",
+      "name": "Mattia",
+      "status": "pending",
+      "role": "editor",
+      "permanent": false,
+      "created_at": 1782752214322,
+      "updated_at": 1782752214322
     }
   ],
-  "nextId": 14
+  "nextId": 15
 }
