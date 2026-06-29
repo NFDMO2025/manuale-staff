@@ -203,11 +203,11 @@
       "username": "ladymulan",
       "password_hash": "$2a$10$VCH.dKPhkna84mRZdYqC5Om4zuoK4uYD/ckfy0ZSxWHk.diKWvxci",
       "name": "Ladymulan",
-      "status": "pending",
+      "status": "approved",
       "role": "editor",
       "permanent": false,
       "created_at": 1782753549077,
-      "updated_at": 1782753549077
+      "updated_at": 1782753576809
     }
   ],
   "nextId": 20
