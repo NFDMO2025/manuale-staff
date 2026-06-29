@@ -181,11 +181,11 @@
       "username": "krikka",
       "password_hash": "$2a$10$iwYZRBh8HDaN6iuWpWCfvu.VWwYcFVhq.WVsdgwbnrRUZujzM2VGq",
       "name": "Josh Homme",
-      "status": "pending",
+      "status": "approved",
       "role": "editor",
       "permanent": false,
       "created_at": 1782753506621,
-      "updated_at": 1782753506621
+      "updated_at": 1782753538577
     },
     {
       "id": 18,
