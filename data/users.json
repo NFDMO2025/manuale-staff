@@ -193,10 +193,10 @@
       "password_hash": "$2a$10$egIhCTTtDfrmkpR.jDS9r.6RSapjuOJxUna.h/y23xnvg8.AuUX/a",
       "name": "ALESSIO CIMA",
       "status": "approved",
-      "role": "editor",
+      "role": "watcher",
       "permanent": false,
       "created_at": 1782753515522,
-      "updated_at": 1782753531808
+      "updated_at": 1782758231991
     },
     {
       "id": 19,
