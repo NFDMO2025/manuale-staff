@@ -120,7 +120,18 @@
       "permanent": false,
       "created_at": 1782752128941,
       "updated_at": 1782752128941
+    },
+    {
+      "id": 12,
+      "username": "gio",
+      "password_hash": "$2a$10$FHX8SZlDLWB8NJdm3k1tSO6oUjAE30rSC1uyjDbIns00x3yPNhdkW",
+      "name": "GIORGINO",
+      "status": "pending",
+      "role": "editor",
+      "permanent": false,
+      "created_at": 1782752130943,
+      "updated_at": 1782752130943
     }
   ],
-  "nextId": 12
+  "nextId": 13
 }
