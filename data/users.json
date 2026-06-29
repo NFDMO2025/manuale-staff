@@ -170,11 +170,11 @@
       "username": "quinnbarbie",
       "password_hash": "$2a$10$7rEz6/5mTlkSQ0aV24XRS.Ki4a4T79tQh5TixkNUYo/cNSGJEQl0q",
       "name": "QuinnBarbie",
-      "status": "pending",
+      "status": "approved",
       "role": "editor",
       "permanent": false,
       "created_at": 1782753500316,
-      "updated_at": 1782753500316
+      "updated_at": 1782753544555
     },
     {
       "id": 17,
