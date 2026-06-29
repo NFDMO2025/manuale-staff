@@ -76,7 +76,18 @@
       "permanent": false,
       "created_at": 1782476960738,
       "updated_at": 1782476979027
+    },
+    {
+      "id": 8,
+      "username": "itsrickyvibe",
+      "password_hash": "$2a$10$SJvxG8/E8M9YdDCK7zG4SOmkPsnGOByR1kV9J1bNfNXt724vrMfJe",
+      "name": "Riccardo",
+      "status": "pending",
+      "role": "editor",
+      "permanent": false,
+      "created_at": 1782752097292,
+      "updated_at": 1782752097292
     }
   ],
-  "nextId": 8
+  "nextId": 9
 }
