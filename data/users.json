@@ -82,11 +82,11 @@
       "username": "itsrickyvibe",
       "password_hash": "$2a$10$SJvxG8/E8M9YdDCK7zG4SOmkPsnGOByR1kV9J1bNfNXt724vrMfJe",
       "name": "Riccardo",
-      "status": "pending",
+      "status": "approved",
       "role": "editor",
       "permanent": false,
       "created_at": 1782752097292,
-      "updated_at": 1782752097292
+      "updated_at": 1782752662025
     },
     {
       "id": 9,
