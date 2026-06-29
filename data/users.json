@@ -182,10 +182,10 @@
       "password_hash": "$2a$10$iwYZRBh8HDaN6iuWpWCfvu.VWwYcFVhq.WVsdgwbnrRUZujzM2VGq",
       "name": "Josh Homme",
       "status": "approved",
-      "role": "editor",
+      "role": "watcher",
       "permanent": false,
       "created_at": 1782753506621,
-      "updated_at": 1782753538577
+      "updated_at": 1782758276226
     },
     {
       "id": 18,
