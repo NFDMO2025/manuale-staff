@@ -61,10 +61,10 @@
       "password_hash": "$2a$10$gG843XIMhNSWnETNtWFzBeSOc.PDrarHXoNp.hafjK.n3IhiyDUJ6",
       "name": "Pitbull",
       "status": "approved",
-      "role": "editor",
+      "role": "admin",
       "permanent": false,
       "created_at": 1782475847710,
-      "updated_at": 1782476041394
+      "updated_at": 1782758248343
     },
     {
       "id": 7,
