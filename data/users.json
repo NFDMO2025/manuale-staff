@@ -104,11 +104,11 @@
       "username": "lusia",
       "password_hash": "$2a$10$GOZhuNWjkGV54xbHyMt6d.7idOt/G/mCJiRsJ0mK2Q78/5hZgTTle",
       "name": "lusia garibaldi",
-      "status": "pending",
+      "status": "approved",
       "role": "editor",
       "permanent": false,
       "created_at": 1782752114599,
-      "updated_at": 1782752114599
+      "updated_at": 1782752642826
     },
     {
       "id": 11,
