@@ -186,7 +186,18 @@
       "permanent": false,
       "created_at": 1782753506621,
       "updated_at": 1782753506621
+    },
+    {
+      "id": 18,
+      "username": "kalyx",
+      "password_hash": "$2a$10$egIhCTTtDfrmkpR.jDS9r.6RSapjuOJxUna.h/y23xnvg8.AuUX/a",
+      "name": "ALESSIO CIMA",
+      "status": "pending",
+      "role": "editor",
+      "permanent": false,
+      "created_at": 1782753515522,
+      "updated_at": 1782753515522
     }
   ],
-  "nextId": 18
+  "nextId": 19
 }
