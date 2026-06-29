@@ -214,11 +214,11 @@
       "username": "lele",
       "password_hash": "$2a$10$6yldwE1rmkM3ZQoTTJ8tRuSo37/KppUI0Cr7i7tEJTlaN1I2lxSUG",
       "name": "Lele",
-      "status": "pending",
+      "status": "approved",
       "role": "editor",
       "permanent": false,
       "created_at": 1782754019581,
-      "updated_at": 1782754019581
+      "updated_at": 1782754529127
     }
   ],
   "nextId": 21
