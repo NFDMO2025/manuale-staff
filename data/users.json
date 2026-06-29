@@ -230,7 +230,18 @@
       "permanent": false,
       "created_at": 1782754981335,
       "updated_at": 1782758213655
+    },
+    {
+      "id": 22,
+      "username": "zuc_ilbionico",
+      "password_hash": "$2a$10$Yz8JDs5UPhpmL5bv4fzPUuG/KX7fK6nKOItHrJpjriwQ9e5Gs58ru",
+      "name": "Zuc_ilbionico",
+      "status": "pending",
+      "role": "editor",
+      "permanent": false,
+      "created_at": 1782768090074,
+      "updated_at": 1782768090074
     }
   ],
-  "nextId": 22
+  "nextId": 23
 }
