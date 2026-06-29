@@ -148,11 +148,11 @@
       "username": "king",
       "password_hash": "$2a$10$d8Udt1iOyEk2AJRzEqrSx.xf3soKexSENLuB.l9TnUEaMcHMQ2ye2",
       "name": "Mattia",
-      "status": "pending",
+      "status": "approved",
       "role": "editor",
       "permanent": false,
       "created_at": 1782752214322,
-      "updated_at": 1782752214322
+      "updated_at": 1782752603896
     },
     {
       "id": 15,
