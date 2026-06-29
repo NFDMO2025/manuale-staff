@@ -153,7 +153,18 @@
       "permanent": false,
       "created_at": 1782752214322,
       "updated_at": 1782752214322
+    },
+    {
+      "id": 15,
+      "username": "paulvape",
+      "password_hash": "$2a$10$ltrjHApK0j5GXwnvd3AyIO7jTrrg5RmhWQ49aX3kms88Q4tHHRXhu",
+      "name": "Paul Vape",
+      "status": "pending",
+      "role": "editor",
+      "permanent": false,
+      "created_at": 1782752253318,
+      "updated_at": 1782752253318
     }
   ],
-  "nextId": 15
+  "nextId": 16
 }
