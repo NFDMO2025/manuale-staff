@@ -131,7 +131,18 @@
       "permanent": false,
       "created_at": 1782752130943,
       "updated_at": 1782752130943
+    },
+    {
+      "id": 13,
+      "username": "umberto",
+      "password_hash": "$2a$10$04YMaZnNckF1Zoa1okOon.s3jR8zs.nMI1Y.VRnhDXvcEbcnjsLeu",
+      "name": "UMBERTO",
+      "status": "pending",
+      "role": "editor",
+      "permanent": false,
+      "created_at": 1782752140542,
+      "updated_at": 1782752140542
     }
   ],
-  "nextId": 13
+  "nextId": 14
 }
