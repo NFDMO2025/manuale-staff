@@ -126,11 +126,11 @@
       "username": "gio",
       "password_hash": "$2a$10$FHX8SZlDLWB8NJdm3k1tSO6oUjAE30rSC1uyjDbIns00x3yPNhdkW",
       "name": "GIORGINO",
-      "status": "pending",
+      "status": "approved",
       "role": "editor",
       "permanent": false,
       "created_at": 1782752130943,
-      "updated_at": 1782752130943
+      "updated_at": 1782752616609
     },
     {
       "id": 13,
