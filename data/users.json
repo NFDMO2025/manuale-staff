@@ -247,11 +247,11 @@
       "username": "dimag",
       "password_hash": "$2a$10$THy51MwU7J7fArScUoxYYe8HDRwBNVzUSQTvtvnZv71K6ZseJjCJC",
       "name": "dimag",
-      "status": "pending",
+      "status": "approved",
       "role": "editor",
       "permanent": false,
       "created_at": 1782769838019,
-      "updated_at": 1782769838019
+      "updated_at": 1782810703696
     }
   ],
   "nextId": 24
