@@ -237,10 +237,10 @@
       "password_hash": "$2a$10$Yz8JDs5UPhpmL5bv4fzPUuG/KX7fK6nKOItHrJpjriwQ9e5Gs58ru",
       "name": "Zuc_ilbionico",
       "status": "approved",
-      "role": "editor",
+      "role": "watcher",
       "permanent": false,
       "created_at": 1782768090074,
-      "updated_at": 1782810718956
+      "updated_at": 1782810740535
     },
     {
       "id": 23,
@@ -248,10 +248,10 @@
       "password_hash": "$2a$10$THy51MwU7J7fArScUoxYYe8HDRwBNVzUSQTvtvnZv71K6ZseJjCJC",
       "name": "dimag",
       "status": "approved",
-      "role": "watcher",
+      "role": "editor",
       "permanent": false,
       "created_at": 1782769838019,
-      "updated_at": 1782810731999
+      "updated_at": 1782810703696
     }
   ],
   "nextId": 24
