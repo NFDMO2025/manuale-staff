@@ -236,11 +236,11 @@
       "username": "zuc_ilbionico",
       "password_hash": "$2a$10$Yz8JDs5UPhpmL5bv4fzPUuG/KX7fK6nKOItHrJpjriwQ9e5Gs58ru",
       "name": "Zuc_ilbionico",
-      "status": "pending",
+      "status": "approved",
       "role": "editor",
       "permanent": false,
       "created_at": 1782768090074,
-      "updated_at": 1782768090074
+      "updated_at": 1782810718956
     },
     {
       "id": 23,
