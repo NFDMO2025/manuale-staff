@@ -1,4 +1,5 @@
 const { loadJson, saveJson, getStorageInfo } = require('./json-store');
+const { pushManualHistory, listManualHistory, getManualHistoryEntry } = require('./history');
 
 const MANUAL_FILE = 'manual.json';
 
@@ -41,6 +42,14 @@ async function getManual() {
 }
 
 async function saveManual(data, updatedBy) {
+  if (manualCache?.data) {
+    await pushManualHistory({
+      data: manualCache.data,
+      updated_at: manualCache.updated_at,
+      updated_by: manualCache.updated_by,
+    });
+  }
+
   manualCache = {
     data,
     updated_at: Date.now(),
@@ -55,6 +64,12 @@ async function resetManual(updatedBy) {
   return saveManual(def, updatedBy);
 }
 
+async function restoreManualFromHistory(entryId, updatedBy) {
+  const entry = await getManualHistoryEntry(entryId);
+  if (!entry) return null;
+  return saveManual(entry.data, updatedBy);
+}
+
 async function initDb() {
   await initManual();
 }
@@ -66,5 +81,8 @@ module.exports = {
   getManual,
   saveManual,
   resetManual,
+  restoreManualFromHistory,
+  listManualHistory,
+  getManualHistoryEntry,
   getDefaultManual,
 };

@@ -2,6 +2,9 @@ const state = {
   data: null,
   editing: false,
   search: '',
+  searchFilters: { section: 'all', sanction: 'all' },
+  viewMode: 'full',
+  manualMeta: null,
   modal: null,
   user: null,
   saving: false,
@@ -32,6 +35,12 @@ function clone(obj) {
 async function loadManual() {
   const result = await api('/api/manual');
   state.data = result.data;
+  state.manualMeta = {
+    updatedAt: result.updatedAt,
+    updatedBy: result.updatedBy,
+  };
+  updateManualMeta();
+  populateSectionFilter();
 }
 
 async function saveData() {
@@ -42,6 +51,8 @@ async function saveData() {
       method: 'PUT',
       body: JSON.stringify({ data: state.data }),
     });
+    state.manualMeta = { updatedAt: result.updatedAt, updatedBy: result.updatedBy };
+    updateManualMeta();
     toast(`Salvato sul server (${result.updatedBy || 'tu'})`);
   } catch (err) {
     toast(err.message || 'Errore salvataggio');
@@ -84,12 +95,100 @@ function renderPills(list) {
     .join('');
 }
 
-function matchesSearch(rule, q) {
-  if (!q) return true;
-  const hay = [rule.code, rule.name, rule.desc, ...(rule.sanctions || []), rule.recidiva]
-    .join(' ')
-    .toLowerCase();
-  return hay.includes(q);
+function highlightHtml(text, q) {
+  if (!q) return escapeHtml(text);
+  const escaped = escapeHtml(text);
+  try {
+    const re = new RegExp(`(${RuleUtils.escapeRegex(q)})`, 'gi');
+    return escaped.replace(re, '<mark class="search-mark">$1</mark>');
+  } catch {
+    return escaped;
+  }
+}
+
+function activeFilters() {
+  return {
+    query: state.search.trim().toLowerCase(),
+    section: state.searchFilters.section,
+    sanction: state.searchFilters.sanction,
+  };
+}
+
+function hasActiveFilters(filters) {
+  return Boolean(filters.query) || filters.section !== 'all' || filters.sanction !== 'all';
+}
+
+function ruleMatches(rule, section, si, filters) {
+  return RuleUtils.matchesFilters(rule, section, si, filters);
+}
+
+function updateSearchCount() {
+  const el = document.getElementById('search-count');
+  if (!el || !state.data) return;
+  const filters = activeFilters();
+  if (!hasActiveFilters(filters)) {
+    el.classList.add('hidden');
+    el.textContent = '';
+    return;
+  }
+  const count = RuleUtils.countMatches(state.data, filters);
+  el.textContent = `${count} risultat${count === 1 ? 'o' : 'i'}`;
+  el.classList.remove('hidden');
+}
+
+function updateManualMeta() {
+  const el = document.getElementById('manual-meta');
+  if (!el || !state.manualMeta?.updatedAt) {
+    el?.classList.add('hidden');
+    return;
+  }
+  const when = new Date(state.manualMeta.updatedAt).toLocaleString('it-IT', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+  el.textContent = `Ultimo aggiornamento: ${when} · @${state.manualMeta.updatedBy || 'system'}`;
+  el.classList.remove('hidden');
+}
+
+function populateSectionFilter() {
+  const select = document.getElementById('filter-section');
+  if (!select || !state.data) return;
+  const current = state.searchFilters.section;
+  const options = ['<option value="all">Tutte le sezioni</option>']
+    .concat(
+      state.data.sections.map(
+        (s, i) => `<option value="${i}">${escapeHtml(s.num)} — ${escapeHtml(s.title)}</option>`
+      )
+    )
+    .join('');
+  select.innerHTML = options;
+  select.value = current;
+}
+
+function renderSanctionFilterPills() {
+  const wrap = document.getElementById('filter-sanction-pills');
+  if (!wrap) return;
+  wrap.innerHTML = RuleUtils.SANCTION_FILTERS.map(
+    (f) =>
+      `<button type="button" class="filter-pill ${state.searchFilters.sanction === f.id ? 'active' : ''}" data-sanction="${f.id}">${f.label}</button>`
+  ).join('');
+  wrap.querySelectorAll('[data-sanction]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      state.searchFilters.sanction = btn.dataset.sanction;
+      renderSanctionFilterPills();
+      render();
+    });
+  });
+}
+
+function scrollToFirstHit() {
+  requestAnimationFrame(() => {
+    const hit = document.querySelector('.search-hit');
+    if (hit) hit.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
 }
 
 function renderHeader() {
@@ -123,16 +222,18 @@ function renderLegend() {
     <button type="button" class="add-row-btn edit-only" id="add-legend">+ Aggiungi voce legenda</button>`;
 }
 
-function renderRuleRow(rule, si, ri, q) {
-  const hit = matchesSearch(rule, q);
-  if (q && !hit) return '';
+function renderRuleRow(rule, si, ri, filters) {
+  const q = filters.query;
+  const hit = ruleMatches(rule, state.data.sections[si], si, filters);
+  if (hasActiveFilters(filters) && !hit) return '';
+  const hl = (text) => (q ? highlightHtml(text, q) : escapeHtml(text));
   return `
-    <tr class="${rule.highlight ? 'highlight' : ''} ${hit && q ? 'search-hit' : ''}" data-section="${si}" data-rule="${ri}">
-      <td data-label="Regola"><span class="rule-code editable" data-edit="rule-code-${si}-${ri}">${escapeHtml(rule.code)}</span></td>
-      <td data-label="Violazione"><span class="rule-name editable" data-edit="rule-name-${si}-${ri}">${escapeHtml(rule.name)}</span></td>
-      <td data-label="Descrizione" class="rule-desc editable" data-edit="rule-desc-${si}-${ri}">${escapeHtml(rule.desc)}</td>
+    <tr class="${rule.highlight ? 'highlight' : ''} ${hit && q ? 'search-hit' : ''}" data-section="${si}" data-rule="${ri}" id="rule-${si}-${ri}">
+      <td data-label="Regola"><span class="rule-code editable" data-edit="rule-code-${si}-${ri}">${hl(rule.code)}</span></td>
+      <td data-label="Violazione"><span class="rule-name editable" data-edit="rule-name-${si}-${ri}">${hl(rule.name)}</span></td>
+      <td data-label="Descrizione" class="rule-desc editable" data-edit="rule-desc-${si}-${ri}">${hl(rule.desc)}</td>
       <td data-label="Sanzione">${renderPills(rule.sanctions)}</td>
-      <td data-label="Recidiva"><span class="rec-text editable" data-edit="rule-recidiva-${si}-${ri}">${escapeHtml(rule.recidiva)}</span></td>
+      <td data-label="Recidiva"><span class="rec-text editable" data-edit="rule-recidiva-${si}-${ri}">${hl(rule.recidiva)}</span></td>
       <td class="edit-only row-actions" data-label="">
         <button type="button" class="mini-btn" data-edit-rule="${si}-${ri}">Modifica</button>
         <button type="button" class="mini-btn danger" data-del-rule="${si}-${ri}" title="Elimina">X</button>
@@ -140,9 +241,11 @@ function renderRuleRow(rule, si, ri, q) {
     </tr>`;
 }
 
-function renderSection(section, si, q) {
-  const rows = section.rules.map((r, ri) => renderRuleRow(r, si, ri, q)).join('');
-  const visible = q ? section.rules.some((r) => matchesSearch(r, q)) : true;
+function renderSection(section, si, filters) {
+  const rows = section.rules.map((r, ri) => renderRuleRow(r, si, ri, filters)).join('');
+  const visible = hasActiveFilters(filters)
+    ? section.rules.some((r) => ruleMatches(r, section, si, filters))
+    : true;
   if (!visible) return '';
 
   const alerts = (section.alerts || [])
@@ -202,26 +305,78 @@ function renderChecklist() {
     </div>`;
 }
 
+function renderQuickView(filters) {
+  const groups = state.data.sections
+    .map((section, si) => {
+      const rules = section.rules.filter((rule) => ruleMatches(rule, section, si, filters));
+      if (!rules.length) return '';
+      const rows = rules
+        .map((rule) => {
+          const sanctions = (rule.sanctions || []).join(' · ') || '—';
+          return `
+            <tr class="quick-row ${rule.highlight ? 'highlight' : ''}">
+              <td><span class="rule-code">${escapeHtml(rule.code)}</span></td>
+              <td><span class="rule-name">${escapeHtml(rule.name)}</span></td>
+              <td>${renderPills(rule.sanctions)}</td>
+              <td class="quick-rec">${escapeHtml(rule.recidiva || '—')}</td>
+            </tr>`;
+        })
+        .join('');
+      return `
+        <div class="quick-section">
+          <div class="quick-section-head">
+            <span class="section-num">${escapeHtml(section.num)}</span>
+            <span class="section-title">${escapeHtml(section.title)}</span>
+          </div>
+          <table class="quick-table">
+            <thead><tr><th>Regola</th><th>Violazione</th><th>Sanzione</th><th>Recidiva</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>`;
+    })
+    .filter(Boolean)
+    .join('');
+
+  if (!groups) {
+    return `<div class="search-empty">Nessun risultato con i filtri attivi.</div>`;
+  }
+
+  return `<div class="quick-view">${groups}</div>`;
+}
+
 function render() {
   if (!state.data) return;
-  const q = state.search.trim().toLowerCase();
+  const filters = activeFilters();
   const root = document.getElementById('app-root');
+  const quickBtn = document.getElementById('btn-view-quick');
 
-  let sectionsHtml = state.data.sections.map((s, i) => renderSection(s, i, q)).join('');
-  if (q && !sectionsHtml.trim()) {
-    sectionsHtml = `<div class="search-empty">Nessun risultato per "<strong>${escapeHtml(q)}</strong>"</div>`;
+  document.body.classList.toggle('view-quick', state.viewMode === 'quick');
+  quickBtn?.classList.toggle('active', state.viewMode === 'quick');
+  updateSearchCount();
+
+  if (state.viewMode === 'quick') {
+    root.innerHTML = renderQuickView(filters);
+    return;
   }
+
+  let sectionsHtml = state.data.sections.map((s, i) => renderSection(s, i, filters)).join('');
+  if (hasActiveFilters(filters) && !sectionsHtml.trim()) {
+    sectionsHtml = `<div class="search-empty">Nessun risultato con i filtri attivi.</div>`;
+  }
+
+  const hideExtras = hasActiveFilters(filters);
 
   root.innerHTML = `
     ${renderHeader()}
-    ${q ? '' : renderLegend()}
+    ${hideExtras ? '' : renderLegend()}
     ${sectionsHtml}
-    ${q ? '' : renderChecklist()}
-    ${q ? '' : `<div class="footer editable" data-edit="footer">${escapeHtml(state.data.footer)}</div>`}
-    ${q ? '' : `<button type="button" class="add-row-btn edit-only" id="add-section">+ Aggiungi sezione</button>`}
+    ${hideExtras ? '' : renderChecklist()}
+    ${hideExtras ? '' : `<div class="footer editable" data-edit="footer">${escapeHtml(state.data.footer)}</div>`}
+    ${hideExtras ? '' : `<button type="button" class="add-row-btn edit-only" id="add-section">+ Aggiungi sezione</button>`}
   `;
 
   bindEvents();
+  if (filters.query) scrollToFirstHit();
 }
 
 function bindEvents() {
@@ -500,11 +655,178 @@ async function resetData() {
   try {
     const result = await api('/api/manual/reset', { method: 'POST' });
     state.data = result.data;
+    state.manualMeta = { updatedAt: result.updatedAt, updatedBy: result.updatedBy };
+    updateManualMeta();
     render();
     toast('Manuale ripristinato');
   } catch (err) {
     toast(err.message || 'Solo gli admin possono ripristinare');
   }
+}
+
+function toggleQuickView() {
+  state.viewMode = state.viewMode === 'quick' ? 'full' : 'quick';
+  const btn = document.getElementById('btn-view-quick');
+  if (btn) {
+    btn.textContent = state.viewMode === 'quick' ? 'Manuale completo' : 'Consultazione rapida';
+  }
+  render();
+}
+
+function openCalculatorModal() {
+  closeModal();
+  const codes = RuleUtils.flattenRules(state.data).map(({ rule }) => rule.code);
+  const datalist = codes.map((c) => `<option value="${escapeHtml(c)}">`).join('');
+
+  const backdrop = document.createElement('div');
+  backdrop.className = 'modal-backdrop';
+  backdrop.innerHTML = `
+    <div class="modal calc-modal">
+      <h3>Calcolatore recidiva</h3>
+      <p class="calc-intro">Inserisci codice regola e numero infrazione per ottenere la sanzione suggerita.</p>
+      <form id="calc-form" class="admin-create-form">
+        <div class="admin-create-grid">
+          <div>
+            <label>Codice regola</label>
+            <input name="code" list="rule-codes" required placeholder="Es. 1.11">
+            <datalist id="rule-codes">${datalist}</datalist>
+          </div>
+          <div>
+            <label>Numero infrazione</label>
+            <input name="offense" type="number" min="1" max="20" value="1" required>
+          </div>
+        </div>
+        <button type="submit" class="tb-btn tb-btn-primary">Calcola sanzione</button>
+      </form>
+      <div id="calc-result" class="calc-result hidden"></div>
+      <div class="modal-actions">
+        <button type="button" class="tb-btn tb-btn-soft" id="modal-cancel">Chiudi</button>
+      </div>
+    </div>`;
+  document.body.appendChild(backdrop);
+  state.modal = backdrop;
+
+  backdrop.querySelector('#modal-cancel').onclick = closeModal;
+  backdrop.addEventListener('click', (ev) => {
+    if (ev.target === backdrop) closeModal();
+  });
+
+  backdrop.querySelector('#calc-form').onsubmit = (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const code = String(fd.get('code') || '').trim();
+    const offense = fd.get('offense');
+    const found = RuleUtils.findRuleByCode(state.data, code);
+    const resultEl = backdrop.querySelector('#calc-result');
+
+    if (!found) {
+      resultEl.classList.remove('hidden');
+      resultEl.innerHTML = `<div class="calc-error">Regola "${escapeHtml(code)}" non trovata.</div>`;
+      return;
+    }
+
+    const calc = RuleUtils.calculateSanction(found.rule, found.section, offense);
+    resultEl.classList.remove('hidden');
+    resultEl.innerHTML = `
+      <div class="calc-card">
+        <div class="calc-rule">${escapeHtml(found.rule.code)} — ${escapeHtml(found.rule.name)}</div>
+        <div class="calc-sanction">${renderPills([calc.sanction])}</div>
+        <div class="calc-meta">
+          <span>Infrazione ${calc.level}ª</span>
+          <span>${escapeHtml(calc.source)}</span>
+        </div>
+        ${calc.note ? `<p class="calc-note">${escapeHtml(calc.note)}</p>` : ''}
+        ${calc.next ? `<p class="calc-next">Prossima: <strong>${escapeHtml(calc.next)}</strong></p>` : ''}
+        <button type="button" class="tb-btn tb-btn-soft calc-goto" data-si="${found.si}" data-ri="${found.ri}">Vai alla regola</button>
+      </div>`;
+
+    resultEl.querySelector('.calc-goto')?.addEventListener('click', () => {
+      closeModal();
+      state.viewMode = 'full';
+      document.getElementById('btn-view-quick').textContent = 'Consultazione rapida';
+      state.search = found.rule.code;
+      document.getElementById('search-input').value = found.rule.code;
+      render();
+    });
+  };
+}
+
+async function openHistoryModal() {
+  closeModal();
+  let entries = [];
+  try {
+    const result = await api('/api/manual/history');
+    entries = result.entries || [];
+  } catch (err) {
+    toast(err.message || 'Errore caricamento storico');
+    return;
+  }
+
+  const canRestore = canEditManual();
+  const rows = entries.length
+    ? entries
+        .map((entry) => {
+          const when = new Date(entry.updatedAt || entry.savedAt).toLocaleString('it-IT', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+          });
+          return `
+            <tr>
+              <td class="history-date">${when}</td>
+              <td>@${escapeHtml(entry.updatedBy || 'system')}</td>
+              <td class="history-actions">
+                ${canRestore ? `<button type="button" class="tb-btn tb-btn-soft" data-restore="${entry.id}">Ripristina</button>` : ''}
+              </td>
+            </tr>`;
+        })
+        .join('')
+    : `<tr><td colspan="3" class="admin-empty">Nessuna versione salvata ancora.</td></tr>`;
+
+  const backdrop = document.createElement('div');
+  backdrop.className = 'modal-backdrop';
+  backdrop.innerHTML = `
+    <div class="modal history-modal">
+      <h3>Storico modifiche</h3>
+      <p class="admin-intro">Ultime ${entries.length} versioni del manuale. Ogni salvataggio crea una voce.</p>
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead><tr><th>Data</th><th>Modificato da</th><th>Azioni</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="tb-btn tb-btn-soft" id="modal-cancel">Chiudi</button>
+      </div>
+    </div>`;
+  document.body.appendChild(backdrop);
+  state.modal = backdrop;
+
+  backdrop.querySelector('#modal-cancel').onclick = closeModal;
+  backdrop.addEventListener('click', (ev) => {
+    if (ev.target === backdrop) closeModal();
+  });
+
+  backdrop.querySelectorAll('[data-restore]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      if (!confirm('Ripristinare questa versione del manuale?')) return;
+      btn.disabled = true;
+      try {
+        const result = await api(`/api/manual/history/${btn.dataset.restore}/restore`, { method: 'POST' });
+        state.data = result.data;
+        state.manualMeta = { updatedAt: result.updatedAt, updatedBy: result.updatedBy };
+        updateManualMeta();
+        closeModal();
+        render();
+        toast('Versione ripristinata');
+      } catch (err) {
+        toast(err.message || 'Ripristino fallito');
+        btn.disabled = false;
+      }
+    });
+  });
 }
 
 /* ── Auth ── */
@@ -1006,6 +1328,7 @@ async function openAdminPanel(filter) {
 }
 
 async function init() {
+  renderSanctionFilterPills();
   document.getElementById('btn-edit').addEventListener('click', toggleEdit);
   document.getElementById('btn-save').addEventListener('click', saveData);
   document.getElementById('btn-export').addEventListener('click', exportJson);
@@ -1016,6 +1339,13 @@ async function init() {
     e.target.value = '';
   });
   document.getElementById('btn-reset').addEventListener('click', resetData);
+  document.getElementById('btn-view-quick').addEventListener('click', toggleQuickView);
+  document.getElementById('btn-calculator').addEventListener('click', openCalculatorModal);
+  document.getElementById('btn-history').addEventListener('click', openHistoryModal);
+  document.getElementById('filter-section').addEventListener('change', (e) => {
+    state.searchFilters.section = e.target.value;
+    render();
+  });
   document.getElementById('search-input').addEventListener('input', (e) => {
     state.search = e.target.value;
     render();

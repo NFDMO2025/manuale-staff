@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const path = require('path');
-const { initDb, getStorageInfo, getManual, saveManual, resetManual } = require('./db');
+const { initDb, getStorageInfo, getManual, saveManual, resetManual, listManualHistory, getManualHistoryEntry, restoreManualFromHistory } = require('./db');
 const {
   initUsers,
   createUser,
@@ -176,6 +176,30 @@ app.put('/api/manual', requireEditor, async (req, res) => {
 
 app.post('/api/manual/reset', requireAdmin, async (req, res) => {
   const result = await resetManual(req.user.username);
+  const manual = await getManual();
+  res.json({ ...result, data: manual.data });
+});
+
+app.get('/api/manual/history', requireApproved, async (_req, res) => {
+  res.json({ entries: await listManualHistory() });
+});
+
+app.get('/api/manual/history/:id', requireApproved, async (req, res) => {
+  const entry = await getManualHistoryEntry(parseInt(req.params.id, 10));
+  if (!entry) return res.status(404).json({ error: 'Versione non trovata' });
+  res.json({
+    id: entry.id,
+    updatedAt: entry.updated_at,
+    updatedBy: entry.updated_by,
+    savedAt: entry.saved_at,
+    data: entry.data,
+  });
+});
+
+app.post('/api/manual/history/:id/restore', requireEditor, async (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  const result = await restoreManualFromHistory(id, req.user.username);
+  if (!result) return res.status(404).json({ error: 'Versione non trovata' });
   const manual = await getManual();
   res.json({ ...result, data: manual.data });
 });
