@@ -685,6 +685,60 @@ body.view-quick .toolbar-filters { display: none; }
   letter-spacing: 0;
 }
 
+.calc-summary {
+  border: 2px solid var(--teal);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  background: linear-gradient(180deg, var(--teal-soft), #fff);
+  margin-bottom: 16px;
+}
+
+.calc-summary-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--teal);
+  margin-bottom: 10px;
+}
+
+.calc-summary-pills {
+  margin-bottom: 10px;
+}
+
+.calc-summary-pills .pill {
+  font-size: 13px;
+  padding: 6px 12px;
+  margin: 3px 6px 3px 0;
+}
+
+.calc-summary-text,
+.calc-summary-note {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+  margin: 6px 0 0;
+}
+
+.calc-copy { margin-top: 14px; }
+
+.calc-details-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin: 4px 0 10px;
+}
+
+.calc-card-detail {
+  padding: 14px;
+}
+
+.calc-card-detail .calc-sanction .pill {
+  font-size: 11px;
+}
+
 .calc-card {
   border: 1px solid var(--line);
   border-radius: var(--radius-md);

@@ -673,10 +673,9 @@ function toggleQuickView() {
   render();
 }
 
-function renderCalcCard(found, offense) {
-  const calc = RuleUtils.calculateSanction(found.rule, found.section, offense);
+function renderCalcDetailCard(found, calc) {
   return `
-    <div class="calc-card">
+    <div class="calc-card calc-card-detail">
       <div class="calc-rule">${escapeHtml(found.rule.code)} — ${escapeHtml(found.rule.name)}</div>
       <div class="calc-sanction">${renderPills([calc.sanction])}</div>
       <div class="calc-meta">
@@ -684,9 +683,32 @@ function renderCalcCard(found, offense) {
         <span>${escapeHtml(calc.source)}</span>
       </div>
       ${calc.note ? `<p class="calc-note">${escapeHtml(calc.note)}</p>` : ''}
-      ${calc.next ? `<p class="calc-next">Prossima: <strong>${escapeHtml(calc.next)}</strong></p>` : ''}
       <button type="button" class="tb-btn tb-btn-soft calc-goto" data-code="${escapeHtml(found.rule.code)}">Vai alla regola</button>
     </div>`;
+}
+
+function renderCalcSummary(summary) {
+  return `
+    <div class="calc-summary">
+      <div class="calc-summary-label">Sanzione da assegnare al giocatore</div>
+      <div class="calc-summary-pills">${renderPills(summary.assignLabels)}</div>
+      <p class="calc-summary-text">${escapeHtml(summary.explanation)}</p>
+      ${summary.notes.map((n) => `<p class="calc-summary-note">${escapeHtml(n)}</p>`).join('')}
+      <button type="button" class="tb-btn tb-btn-primary calc-copy" id="calc-copy">Copia per ticket Discord</button>
+    </div>`;
+}
+
+function bindCalcGotoButtons(container) {
+  container.querySelectorAll('.calc-goto').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      closeModal();
+      state.viewMode = 'full';
+      document.getElementById('btn-view-quick').textContent = 'Consultazione rapida';
+      state.search = btn.dataset.code;
+      document.getElementById('search-input').value = btn.dataset.code;
+      render();
+    });
+  });
 }
 
 function calcRuleRowHtml(index, { required = false, showRemove = false } = {}) {
@@ -797,7 +819,7 @@ function openCalculatorModal() {
     e.preventDefault();
     const entries = readCalcEntries(e.target);
     const resultEl = backdrop.querySelector('#calc-result');
-    const cards = [];
+    const results = [];
     const errors = [];
 
     if (!entries.length) {
@@ -812,29 +834,45 @@ function openCalculatorModal() {
         errors.push(`Regola "${entry.code}" non trovata.`);
         return;
       }
-      cards.push(renderCalcCard(found, entry.offense));
+      const calc = RuleUtils.calculateSanction(found.rule, found.section, entry.offense);
+      results.push({
+        found,
+        calc,
+        ruleCode: found.rule.code,
+        ruleName: found.rule.name,
+      });
     });
 
     resultEl.classList.remove('hidden');
-    if (!cards.length) {
+    if (!results.length) {
       resultEl.innerHTML = `<div class="calc-error">${errors.map((e) => escapeHtml(e)).join('<br>')}</div>`;
       return;
     }
 
+    const summary = RuleUtils.combineSanctions(
+      results.map((r) => ({ ruleCode: r.ruleCode, ruleName: r.ruleName, calc: r.calc }))
+    );
+
+    const detailsTitle = results.length > 1
+      ? '<div class="calc-details-title">Dettaglio per regola</div>'
+      : '';
+
     resultEl.innerHTML = `
       ${errors.length ? `<div class="calc-error">${errors.map((e) => escapeHtml(e)).join('<br>')}</div>` : ''}
-      <div class="calc-results">${cards.join('')}</div>`;
+      ${renderCalcSummary(summary)}
+      ${detailsTitle}
+      <div class="calc-results">${results.map((r) => renderCalcDetailCard(r.found, r.calc)).join('')}</div>`;
 
-    resultEl.querySelectorAll('.calc-goto').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        closeModal();
-        state.viewMode = 'full';
-        document.getElementById('btn-view-quick').textContent = 'Consultazione rapida';
-        state.search = btn.dataset.code;
-        document.getElementById('search-input').value = btn.dataset.code;
-        render();
-      });
+    backdrop.querySelector('#calc-copy')?.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(RuleUtils.formatCombinedCopy(summary));
+        toast('Copiato — incolla nel ticket Discord');
+      } catch {
+        toast('Errore copia');
+      }
     });
+
+    bindCalcGotoButtons(resultEl);
   };
 }
 

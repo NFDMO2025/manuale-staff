@@ -218,6 +218,98 @@ const RuleUtils = (() => {
     };
   }
 
+  function classifySanction(text) {
+    const t = String(text).toUpperCase().trim();
+    if (t.includes('PERMABAN') || (t.includes('PERMA') && t.includes('BAN'))) {
+      return { kind: 'permaban', label: text, weight: 1000 };
+    }
+    if (/7\s*GG/.test(t)) return { kind: 'ban_days', days: 7, label: text, weight: 700 };
+    if (/3\s*GG/.test(t)) return { kind: 'ban_days', days: 3, label: text, weight: 300 };
+    if (t.includes('48H')) return { kind: 'ban_hours', hours: 48, label: text, weight: 48 };
+    if (t.includes('24H')) return { kind: 'ban_hours', hours: 24, label: text, weight: 24 };
+    if (/WARN\s*2/.test(t)) return { kind: 'warn', degree: 2, label: text, weight: 12 };
+    if (/WARN/.test(t)) return { kind: 'warn', degree: 1, label: text, weight: 10 };
+    if (t.includes('WIPE')) return { kind: 'special', label: text, weight: 500 };
+    if (t.includes('ANNULL') || t.includes('AZIONE')) return { kind: 'special', label: text, weight: 5 };
+    if (t.includes('RICHIAMO')) return { kind: 'special', label: text, weight: 8 };
+    return { kind: 'other', label: text, weight: 1 };
+  }
+
+  function combineSanctions(items) {
+    if (!items.length) return null;
+
+    const rows = items.map((item) => ({
+      ...item,
+      cls: classifySanction(item.calc.sanction),
+    }));
+
+    if (rows.length === 1) {
+      return {
+        single: true,
+        assignLabels: [rows[0].calc.sanction],
+        lines: [`${rows[0].ruleCode} — ${rows[0].ruleName}: ${rows[0].calc.sanction}`],
+        explanation: 'Sanzione per la violazione indicata.',
+        notes: [],
+      };
+    }
+
+    if (rows.some((r) => r.cls.kind === 'permaban')) {
+      return {
+        assignLabels: ['PERMABAN'],
+        lines: rows.map((r) => `${r.ruleCode} — ${r.ruleName}: ${r.calc.sanction}`),
+        explanation: 'Almeno una regola prevede PERMABAN — prevale su ogni altra sanzione.',
+        notes: [],
+      };
+    }
+
+    const assignLabels = [];
+    const notes = [];
+
+    rows.filter((r) => r.cls.kind === 'warn').forEach((r) => {
+      assignLabels.push(`${r.calc.sanction} (${r.ruleCode})`);
+    });
+
+    const hourBans = rows.filter((r) => r.cls.kind === 'ban_hours');
+    if (hourBans.length === 1) {
+      assignLabels.push(hourBans[0].calc.sanction);
+    } else if (hourBans.length > 1) {
+      const total = hourBans.reduce((sum, r) => sum + r.cls.hours, 0);
+      assignLabels.push(`BAN ${total}H`);
+      notes.push(`Ban ore sommati: ${hourBans.map((r) => `${r.cls.hours}H`).join(' + ')} = ${total}H`);
+    }
+
+    const dayBans = rows.filter((r) => r.cls.kind === 'ban_days');
+    if (dayBans.length === 1) {
+      assignLabels.push(dayBans[0].calc.sanction);
+    } else if (dayBans.length > 1) {
+      const total = dayBans.reduce((sum, r) => sum + r.cls.days, 0);
+      assignLabels.push(`BAN ${total} GG`);
+      notes.push(`Ban giorni sommati: ${dayBans.map((r) => `${r.cls.days} GG`).join(' + ')} = ${total} GG`);
+    }
+
+    rows
+      .filter((r) => r.cls.kind === 'special' || r.cls.kind === 'other')
+      .forEach((r) => assignLabels.push(`${r.calc.sanction} (${r.ruleCode})`));
+
+    return {
+      assignLabels,
+      lines: rows.map((r) => `${r.ruleCode} — ${r.ruleName}: ${r.calc.sanction}`),
+      explanation:
+        'Episodio con più regole violate: applica tutte le sanzioni elencate. I ban in ore/giorni vengono sommati quando possibile.',
+      notes,
+    };
+  }
+
+  function formatCombinedCopy(summary) {
+    const total = summary.assignLabels.join(' + ');
+    return [
+      'Sanzioni da assegnare:',
+      ...summary.lines.map((line) => `- ${line}`),
+      '',
+      `Totale consigliato: ${total}`,
+    ].join('\n');
+  }
+
   return {
     SANCTION_FILTERS,
     flattenRules,
@@ -226,6 +318,8 @@ const RuleUtils = (() => {
     matchesFilters,
     countMatches,
     calculateSanction,
+    combineSanctions,
+    formatCombinedCopy,
     escapeRegex,
   };
 })();
