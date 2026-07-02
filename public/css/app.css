@@ -626,12 +626,38 @@ body.view-quick .toolbar-filters { display: none; }
 
 .calc-rule-row {
   display: grid;
-  grid-template-columns: 1fr 100px;
-  gap: 12px;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: end;
   padding: 12px 14px;
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   background: var(--surface-soft);
+}
+
+.calc-rule-fields {
+  display: grid;
+  grid-template-columns: 1fr 100px;
+  gap: 12px;
+}
+
+.calc-form-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.calc-row-remove {
+  font-size: 11px;
+  padding: 8px 10px;
+  align-self: end;
+  color: var(--danger);
+}
+
+.calc-row-remove:hover {
+  background: var(--danger-soft);
 }
 
 .calc-rule-row label {

@@ -689,42 +689,90 @@ function renderCalcCard(found, offense) {
     </div>`;
 }
 
+function calcRuleRowHtml(index, { required = false, showRemove = false } = {}) {
+  return `
+    <div class="calc-rule-row" data-calc-row="${index}">
+      <div class="calc-rule-fields">
+        <div>
+          <label>Codice regola ${index}</label>
+          <input class="calc-code" list="rule-codes" ${required ? 'required' : ''} placeholder="Es. 1.11">
+        </div>
+        <div>
+          <label>Infrazione</label>
+          <input class="calc-offense" type="number" min="1" max="20" value="1" ${required ? 'required' : ''}>
+        </div>
+      </div>
+      <button type="button" class="calc-row-remove tb-btn tb-btn-soft" title="Rimuovi regola" ${showRemove ? '' : 'hidden'}>Rimuovi</button>
+    </div>`;
+}
+
+function bindCalcRuleRows(container, datalistHtml) {
+  const list = container.querySelector('.calc-rules-list');
+  const addBtn = container.querySelector('#calc-add-rule');
+  const maxRows = 8;
+
+  function renumberRows() {
+    const rows = list.querySelectorAll('.calc-rule-row');
+    rows.forEach((row, i) => {
+      const num = i + 1;
+      row.dataset.calcRow = num;
+      row.querySelector('label').textContent = `Codice regola ${num}`;
+      const removeBtn = row.querySelector('.calc-row-remove');
+      removeBtn.hidden = rows.length <= 1;
+    });
+    addBtn.disabled = rows.length >= maxRows;
+    addBtn.textContent = rows.length >= maxRows ? 'Massimo 8 regole' : '+ Aggiungi regola';
+  }
+
+  addBtn.addEventListener('click', () => {
+    if (list.querySelectorAll('.calc-rule-row').length >= maxRows) return;
+    list.insertAdjacentHTML('beforeend', calcRuleRowHtml(list.children.length + 1, { showRemove: true }));
+    renumberRows();
+  });
+
+  list.addEventListener('click', (ev) => {
+    const btn = ev.target.closest('.calc-row-remove');
+    if (!btn) return;
+    btn.closest('.calc-rule-row')?.remove();
+    renumberRows();
+  });
+
+  renumberRows();
+}
+
+function readCalcEntries(form) {
+  return [...form.querySelectorAll('.calc-rule-row')]
+    .map((row) => ({
+      code: row.querySelector('.calc-code')?.value.trim() || '',
+      offense: row.querySelector('.calc-offense')?.value || 1,
+    }))
+    .filter((entry) => entry.code);
+}
+
 function openCalculatorModal() {
   closeModal();
   const codes = RuleUtils.flattenRules(state.data).map(({ rule }) => rule.code);
   const datalist = codes.map((c) => `<option value="${escapeHtml(c)}">`).join('');
+  const canManageRows = canEditManual();
 
   const backdrop = document.createElement('div');
   backdrop.className = 'modal-backdrop';
   backdrop.innerHTML = `
     <div class="modal calc-modal">
       <h3>Calcolatore recidiva</h3>
-      <p class="calc-intro">Inserisci una o più regole violate con il relativo numero di infrazione.</p>
+      <p class="calc-intro">
+        Inserisci le regole violate e il numero di infrazione per ciascuna.
+        ${canManageRows ? 'Puoi aggiungere o rimuovere righe con i pulsanti sotto.' : ''}
+      </p>
       <form id="calc-form" class="admin-create-form">
         <div class="calc-rules-list">
-          <div class="calc-rule-row">
-            <div>
-              <label>Codice regola 1</label>
-              <input name="code1" list="rule-codes" required placeholder="Es. 1.11">
-            </div>
-            <div>
-              <label>Infrazione</label>
-              <input name="offense1" type="number" min="1" max="20" value="1" required>
-            </div>
-          </div>
-          <div class="calc-rule-row">
-            <div>
-              <label>Codice regola 2 <span class="calc-optional">(opzionale)</span></label>
-              <input name="code2" list="rule-codes" placeholder="Es. 2.15">
-            </div>
-            <div>
-              <label>Infrazione</label>
-              <input name="offense2" type="number" min="1" max="20" value="1">
-            </div>
-          </div>
+          ${calcRuleRowHtml(1, { required: true })}
           <datalist id="rule-codes">${datalist}</datalist>
         </div>
-        <button type="submit" class="tb-btn tb-btn-primary">Calcola sanzioni</button>
+        <div class="calc-form-actions">
+          <button type="button" class="tb-btn tb-btn-soft" id="calc-add-rule">+ Aggiungi regola</button>
+          <button type="submit" class="tb-btn tb-btn-primary">Calcola sanzioni</button>
+        </div>
       </form>
       <div id="calc-result" class="calc-result hidden"></div>
       <div class="modal-actions">
@@ -734,6 +782,12 @@ function openCalculatorModal() {
   document.body.appendChild(backdrop);
   state.modal = backdrop;
 
+  bindCalcRuleRows(backdrop, datalist);
+
+  if (!canManageRows) {
+    backdrop.querySelector('#calc-add-rule').classList.add('hidden');
+  }
+
   backdrop.querySelector('#modal-cancel').onclick = closeModal;
   backdrop.addEventListener('click', (ev) => {
     if (ev.target === backdrop) closeModal();
@@ -741,15 +795,16 @@ function openCalculatorModal() {
 
   backdrop.querySelector('#calc-form').onsubmit = (e) => {
     e.preventDefault();
-    const fd = new FormData(e.target);
-    const entries = [
-      { code: String(fd.get('code1') || '').trim(), offense: fd.get('offense1') },
-      { code: String(fd.get('code2') || '').trim(), offense: fd.get('offense2') || 1 },
-    ].filter((entry) => entry.code);
-
+    const entries = readCalcEntries(e.target);
     const resultEl = backdrop.querySelector('#calc-result');
     const cards = [];
     const errors = [];
+
+    if (!entries.length) {
+      resultEl.classList.remove('hidden');
+      resultEl.innerHTML = '<div class="calc-error">Inserisci almeno un codice regola.</div>';
+      return;
+    }
 
     entries.forEach((entry) => {
       const found = RuleUtils.findRuleByCode(state.data, entry.code);
@@ -762,7 +817,7 @@ function openCalculatorModal() {
 
     resultEl.classList.remove('hidden');
     if (!cards.length) {
-      resultEl.innerHTML = `<div class="calc-error">${errors.join(' ')}</div>`;
+      resultEl.innerHTML = `<div class="calc-error">${errors.map((e) => escapeHtml(e)).join('<br>')}</div>`;
       return;
     }
 
