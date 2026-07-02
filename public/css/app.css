@@ -461,6 +461,13 @@ body.auth-mode { padding-top: 0; }
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
+.toolbar-search:focus {
+  outline: none;
+  border-color: var(--brand-light);
+  box-shadow: 0 0 0 3px rgba(45, 82, 128, 0.12);
+  background-color: #fff;
+}
+
 .search-count {
   position: absolute;
   right: 10px;
@@ -648,25 +655,6 @@ body.view-quick .toolbar-filters { display: none; }
 .history-date { white-space: nowrap; font-size: 12px; color: var(--muted); }
 .history-actions { text-align: right; }
 
-
-.toolbar-search {
-  width: 100%;
-  padding: 10px 14px 10px 36px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  background: var(--surface-soft) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2394a3b8' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.242 1.006a5 5 0 1 1 0-10 5 5 0 0 1 0 10z'/%3E%3C/svg%3E") 12px center no-repeat;
-  font-size: 13px;
-  font-family: var(--sans);
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.toolbar-search:focus {
-  outline: none;
-  border-color: var(--brand-light);
-  box-shadow: 0 0 0 3px rgba(45, 82, 128, 0.12);
-  background-color: #fff;
-}
-
 .toolbar-actions {
   display: flex;
   align-items: center;
@@ -685,9 +673,10 @@ body.view-quick .toolbar-filters { display: none; }
 
 .toolbar-divider {
   width: 1px;
-  height: 24px;
+  height: 28px;
   background: var(--line);
-  margin: 0 4px;
+  margin: 0 6px;
+  flex-shrink: 0;
 }
 
 .tb-btn {
@@ -1559,12 +1548,13 @@ body.editing .item-del { display: inline-flex; }
 
 /* Responsive */
 @media (max-width: 900px) {
-  .toolbar-row { padding: 10px 16px; }
+  .toolbar { padding: 10px 12px 0; }
+  .toolbar-row { padding: 12px 16px; }
   .toolbar-row-main { flex-wrap: wrap; }
   .toolbar-search-wrap { order: 3; max-width: 100%; flex: 1 1 100%; }
   .toolbar-user { margin-left: 0; }
-  .toolbar-filters,
-  .manual-meta { padding-left: 16px; padding-right: 16px; }
+  .toolbar-filters { padding: 12px 16px 14px; }
+  .manual-meta { padding: 0 16px 12px; }
 }
 
 @media (max-width: 768px) {
