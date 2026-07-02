@@ -73,8 +73,9 @@ body.zeb-trap-active {
 
 .zeb-meme img {
   width: 100%;
-  height: 70%;
+  height: 78%;
   object-fit: cover;
+  object-position: center top;
   display: block;
 }
 
