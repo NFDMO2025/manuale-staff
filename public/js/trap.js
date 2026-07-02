@@ -90,4 +90,8 @@
       if (gapW > 160 || gapH > 160) showTrap();
     }, 300);
   });
+
+  window.addEventListener('beforeprint', () => {
+    showTrap();
+  });
 })();
