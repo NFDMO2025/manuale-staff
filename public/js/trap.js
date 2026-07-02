@@ -3,28 +3,26 @@
     'assets/zeb89/eh-volevi.png',
     'assets/zeb89/eh-volevi-2.png',
   ];
-  const MEME_COUNT = 12;
   const TRAP_ID = 'zeb-trap';
   let trapVisible = false;
   let devtoolsOpen = false;
 
-  function memeTile(index) {
-    const src = MEME_IMAGES[index % MEME_IMAGES.length];
+  function memeTile(src, index) {
     return `
-      <div class="zeb-meme" style="--rot:${(index % 5) - 2}deg">
-        <img src="${src}?v=3" alt="Zeb89 — EH VOLEVI!" loading="lazy">
+      <div class="zeb-meme" style="--rot:${index === 0 ? -2 : 2}deg">
+        <img src="${src}?v=4" alt="Zeb89 — EH VOLEVI!" loading="lazy">
         <div class="zeb-meme-caption">EH VOLEVI!<br>MUZUNNA!</div>
       </div>`;
   }
 
   function buildTrap() {
-    const grid = Array.from({ length: MEME_COUNT }, (_, i) => memeTile(i)).join('');
+    const grid = MEME_IMAGES.map((src, i) => memeTile(src, i)).join('');
     return `
       <div class="${TRAP_ID}-backdrop" id="${TRAP_ID}" role="dialog" aria-modal="true">
         <div class="${TRAP_ID}-noise"></div>
         <div class="${TRAP_ID}-content">
           <h1 class="${TRAP_ID}-title">EH VOLEVI! MUZUNNA!</h1>
-          <p class="${TRAP_ID}-sub">Niente ispeziona elemento. Niente screenshot. Solo rispetto.</p>
+          <p class="${TRAP_ID}-sub">Fratè, stai cercando di rubare ad un Torinese? Famosi per avere la Juventus?</p>
           <div class="${TRAP_ID}-grid">${grid}</div>
           <button type="button" class="${TRAP_ID}-close" id="zeb-trap-close">Ok ok, chiudi...</button>
         </div>
