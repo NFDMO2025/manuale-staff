@@ -716,7 +716,7 @@ function bindCalcRuleRows(container, datalistHtml) {
     rows.forEach((row, i) => {
       const num = i + 1;
       row.dataset.calcRow = num;
-      row.querySelector('label').textContent = `Codice regola ${num}`;
+      row.querySelector('.calc-rule-fields > div:first-child label').textContent = `Codice regola ${num}`;
       const removeBtn = row.querySelector('.calc-row-remove');
       removeBtn.hidden = rows.length <= 1;
     });
