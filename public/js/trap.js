@@ -1,14 +1,18 @@
 (() => {
-  const MEME_IMG = 'assets/zeb89/eh-volevi.png?v=2';
+  const MEME_IMAGES = [
+    'assets/zeb89/eh-volevi.png',
+    'assets/zeb89/eh-volevi-2.png',
+  ];
   const MEME_COUNT = 12;
   const TRAP_ID = 'zeb-trap';
   let trapVisible = false;
   let devtoolsOpen = false;
 
   function memeTile(index) {
+    const src = MEME_IMAGES[index % MEME_IMAGES.length];
     return `
       <div class="zeb-meme" style="--rot:${(index % 5) - 2}deg">
-        <img src="${MEME_IMG}" alt="Zeb89 — EH VOLEVI!" loading="lazy">
+        <img src="${src}?v=3" alt="Zeb89 — EH VOLEVI!" loading="lazy">
         <div class="zeb-meme-caption">EH VOLEVI!<br>MUZUNNA!</div>
       </div>`;
   }
