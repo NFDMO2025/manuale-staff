@@ -673,6 +673,22 @@ function toggleQuickView() {
   render();
 }
 
+function renderCalcCard(found, offense) {
+  const calc = RuleUtils.calculateSanction(found.rule, found.section, offense);
+  return `
+    <div class="calc-card">
+      <div class="calc-rule">${escapeHtml(found.rule.code)} — ${escapeHtml(found.rule.name)}</div>
+      <div class="calc-sanction">${renderPills([calc.sanction])}</div>
+      <div class="calc-meta">
+        <span>Infrazione ${calc.level}ª</span>
+        <span>${escapeHtml(calc.source)}</span>
+      </div>
+      ${calc.note ? `<p class="calc-note">${escapeHtml(calc.note)}</p>` : ''}
+      ${calc.next ? `<p class="calc-next">Prossima: <strong>${escapeHtml(calc.next)}</strong></p>` : ''}
+      <button type="button" class="tb-btn tb-btn-soft calc-goto" data-code="${escapeHtml(found.rule.code)}">Vai alla regola</button>
+    </div>`;
+}
+
 function openCalculatorModal() {
   closeModal();
   const codes = RuleUtils.flattenRules(state.data).map(({ rule }) => rule.code);
@@ -683,20 +699,32 @@ function openCalculatorModal() {
   backdrop.innerHTML = `
     <div class="modal calc-modal">
       <h3>Calcolatore recidiva</h3>
-      <p class="calc-intro">Inserisci codice regola e numero infrazione per ottenere la sanzione suggerita.</p>
+      <p class="calc-intro">Inserisci una o più regole violate con il relativo numero di infrazione.</p>
       <form id="calc-form" class="admin-create-form">
-        <div class="admin-create-grid">
-          <div>
-            <label>Codice regola</label>
-            <input name="code" list="rule-codes" required placeholder="Es. 1.11">
-            <datalist id="rule-codes">${datalist}</datalist>
+        <div class="calc-rules-list">
+          <div class="calc-rule-row">
+            <div>
+              <label>Codice regola 1</label>
+              <input name="code1" list="rule-codes" required placeholder="Es. 1.11">
+            </div>
+            <div>
+              <label>Infrazione</label>
+              <input name="offense1" type="number" min="1" max="20" value="1" required>
+            </div>
           </div>
-          <div>
-            <label>Numero infrazione</label>
-            <input name="offense" type="number" min="1" max="20" value="1" required>
+          <div class="calc-rule-row">
+            <div>
+              <label>Codice regola 2 <span class="calc-optional">(opzionale)</span></label>
+              <input name="code2" list="rule-codes" placeholder="Es. 2.15">
+            </div>
+            <div>
+              <label>Infrazione</label>
+              <input name="offense2" type="number" min="1" max="20" value="1">
+            </div>
           </div>
+          <datalist id="rule-codes">${datalist}</datalist>
         </div>
-        <button type="submit" class="tb-btn tb-btn-primary">Calcola sanzione</button>
+        <button type="submit" class="tb-btn tb-btn-primary">Calcola sanzioni</button>
       </form>
       <div id="calc-result" class="calc-result hidden"></div>
       <div class="modal-actions">
@@ -714,39 +742,43 @@ function openCalculatorModal() {
   backdrop.querySelector('#calc-form').onsubmit = (e) => {
     e.preventDefault();
     const fd = new FormData(e.target);
-    const code = String(fd.get('code') || '').trim();
-    const offense = fd.get('offense');
-    const found = RuleUtils.findRuleByCode(state.data, code);
-    const resultEl = backdrop.querySelector('#calc-result');
+    const entries = [
+      { code: String(fd.get('code1') || '').trim(), offense: fd.get('offense1') },
+      { code: String(fd.get('code2') || '').trim(), offense: fd.get('offense2') || 1 },
+    ].filter((entry) => entry.code);
 
-    if (!found) {
-      resultEl.classList.remove('hidden');
-      resultEl.innerHTML = `<div class="calc-error">Regola "${escapeHtml(code)}" non trovata.</div>`;
+    const resultEl = backdrop.querySelector('#calc-result');
+    const cards = [];
+    const errors = [];
+
+    entries.forEach((entry) => {
+      const found = RuleUtils.findRuleByCode(state.data, entry.code);
+      if (!found) {
+        errors.push(`Regola "${entry.code}" non trovata.`);
+        return;
+      }
+      cards.push(renderCalcCard(found, entry.offense));
+    });
+
+    resultEl.classList.remove('hidden');
+    if (!cards.length) {
+      resultEl.innerHTML = `<div class="calc-error">${errors.join(' ')}</div>`;
       return;
     }
 
-    const calc = RuleUtils.calculateSanction(found.rule, found.section, offense);
-    resultEl.classList.remove('hidden');
     resultEl.innerHTML = `
-      <div class="calc-card">
-        <div class="calc-rule">${escapeHtml(found.rule.code)} — ${escapeHtml(found.rule.name)}</div>
-        <div class="calc-sanction">${renderPills([calc.sanction])}</div>
-        <div class="calc-meta">
-          <span>Infrazione ${calc.level}ª</span>
-          <span>${escapeHtml(calc.source)}</span>
-        </div>
-        ${calc.note ? `<p class="calc-note">${escapeHtml(calc.note)}</p>` : ''}
-        ${calc.next ? `<p class="calc-next">Prossima: <strong>${escapeHtml(calc.next)}</strong></p>` : ''}
-        <button type="button" class="tb-btn tb-btn-soft calc-goto" data-si="${found.si}" data-ri="${found.ri}">Vai alla regola</button>
-      </div>`;
+      ${errors.length ? `<div class="calc-error">${errors.map((e) => escapeHtml(e)).join('<br>')}</div>` : ''}
+      <div class="calc-results">${cards.join('')}</div>`;
 
-    resultEl.querySelector('.calc-goto')?.addEventListener('click', () => {
-      closeModal();
-      state.viewMode = 'full';
-      document.getElementById('btn-view-quick').textContent = 'Consultazione rapida';
-      state.search = found.rule.code;
-      document.getElementById('search-input').value = found.rule.code;
-      render();
+    resultEl.querySelectorAll('.calc-goto').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        closeModal();
+        state.viewMode = 'full';
+        document.getElementById('btn-view-quick').textContent = 'Consultazione rapida';
+        state.search = btn.dataset.code;
+        document.getElementById('search-input').value = btn.dataset.code;
+        render();
+      });
     });
   };
 }
