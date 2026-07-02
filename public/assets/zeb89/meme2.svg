@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 280" role="img">
+  <rect width="400" height="280" fill="#e74c3c"/>
+  <ellipse cx="200" cy="125" rx="95" ry="105" fill="#f4c99b"/>
+  <ellipse cx="200" cy="230" rx="110" ry="40" fill="#333"/>
+  <ellipse cx="165" cy="115" rx="18" ry="22" fill="#fff"/>
+  <ellipse cx="235" cy="115" rx="18" ry="22" fill="#fff"/>
+  <circle cx="168" cy="118" r="9" fill="#111"/>
+  <circle cx="238" cy="118" r="9" fill="#111"/>
+  <ellipse cx="200" cy="175" rx="35" ry="25" fill="#111"/>
+  <ellipse cx="200" cy="168" rx="20" ry="12" fill="#e74c3c"/>
+  <text x="200" y="50" text-anchor="middle" fill="#fff" font-family="Arial Black,sans-serif" font-size="22" font-weight="900">MUZUNNA!</text>
+</svg>

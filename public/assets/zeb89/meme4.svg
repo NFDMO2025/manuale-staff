@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 280" role="img">
+  <rect width="400" height="280" fill="#9b59b6"/>
+  <ellipse cx="200" cy="120" rx="88" ry="98" fill="#f4c99b"/>
+  <rect x="140" y="195" width="120" height="85" fill="#222"/>
+  <circle cx="170" cy="115" r="20" fill="#fff"/>
+  <circle cx="230" cy="115" r="20" fill="#fff"/>
+  <circle cx="175" cy="115" r="10" fill="#111"/>
+  <circle cx="235" cy="115" r="10" fill="#111"/>
+  <line x1="155" y1="105" x2="185" y2="100" stroke="#111" stroke-width="4"/>
+  <line x1="245" y1="105" x2="215" y2="100" stroke="#111" stroke-width="4"/>
+  <rect x="175" y="155" width="50" height="8" rx="4" fill="#111"/>
+  <text x="200" y="40" text-anchor="middle" fill="#ffd700" font-family="Arial Black,sans-serif" font-size="20" font-weight="900">NO SCREENSHOT</text>
+</svg>
