@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/app.css?v=9">
+  <link rel="stylesheet" href="css/app.css?v=10">
   <link rel="stylesheet" href="css/trap.css?v=3">
 </head>
 <body>
@@ -109,6 +109,10 @@
         </div>
 
         <div class="toolbar-row toolbar-row-tools">
+          <div class="toolbar-nav" id="toolbar-nav">
+            <button type="button" class="tb-btn tb-btn-nav active" id="btn-page-manual">Manuale sanzioni</button>
+            <button type="button" class="tb-btn tb-btn-nav" id="btn-page-regolamento">Regolamento</button>
+          </div>
           <div class="toolbar-tools">
             <button type="button" class="tb-btn tb-btn-soft" id="btn-view-quick">Consultazione rapida</button>
             <button type="button" class="tb-btn tb-btn-soft" id="btn-calculator">Calcolatore</button>
@@ -153,7 +157,8 @@
 
   <script src="js/trap.js?v=5"></script>
   <script src="js/default-data.js"></script>
+  <script src="js/default-regolamento-data.js"></script>
   <script src="js/rule-utils.js"></script>
-  <script src="js/app.js?v=12"></script>
+  <script src="js/app.js?v=13"></script>
 </body>
 </html>

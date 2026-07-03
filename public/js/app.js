@@ -1,5 +1,7 @@
 const state = {
   data: null,
+  regolamento: null,
+  page: 'manual',
   editing: false,
   search: '',
   searchFilters: { section: 'all', sanction: 'all' },
@@ -40,6 +42,11 @@ async function loadManual() {
     updatedBy: result.updatedBy,
   };
   updateManualMeta();
+  populateSectionFilter();
+}
+
+function loadRegolamento() {
+  state.regolamento = window.DEFAULT_REGOLAMENTO || null;
   populateSectionFilter();
 }
 
@@ -155,8 +162,24 @@ function updateManualMeta() {
 
 function populateSectionFilter() {
   const select = document.getElementById('filter-section');
-  if (!select || !state.data) return;
+  if (!select) return;
+
   const current = state.searchFilters.section;
+
+  if (state.page === 'regolamento' && state.regolamento) {
+    const options = ['<option value="all">Tutte le sezioni</option>']
+      .concat(
+        state.regolamento.sections.map(
+          (s, i) => `<option value="${i}">${escapeHtml(s.num)} — ${escapeHtml(s.title)}</option>`
+        )
+      )
+      .join('');
+    select.innerHTML = options;
+    select.value = current;
+    return;
+  }
+
+  if (!state.data) return;
   const options = ['<option value="all">Tutte le sezioni</option>']
     .concat(
       state.data.sections.map(
@@ -344,7 +367,172 @@ function renderQuickView(filters) {
   return `<div class="quick-view">${groups}</div>`;
 }
 
+function regolamentoFilters() {
+  return {
+    query: state.search.trim().toLowerCase(),
+    section: state.searchFilters.section,
+  };
+}
+
+function regolamentoItemMatches(item, section, si, filters) {
+  if (filters.section !== 'all' && String(si) !== filters.section) return false;
+  if (!filters.query) return true;
+  const hay = `${item.num} ${item.text} ${section.num} ${section.title}`.toLowerCase();
+  return hay.includes(filters.query);
+}
+
+function updateRegolamentoSearchCount(filters) {
+  const el = document.getElementById('search-count');
+  if (!el || !state.regolamento) return;
+  const hasQuery = Boolean(filters.query) || filters.section !== 'all';
+  if (!hasQuery) {
+    el.classList.add('hidden');
+    el.textContent = '';
+    return;
+  }
+  let count = 0;
+  state.regolamento.sections.forEach((section, si) => {
+    if (filters.section !== 'all' && String(si) !== filters.section) return;
+    section.items.forEach((item) => {
+      if (regolamentoItemMatches(item, section, si, filters)) count += 1;
+    });
+  });
+  el.textContent = `${count} risultat${count === 1 ? 'o' : 'i'}`;
+  el.classList.remove('hidden');
+}
+
+function renderRegolamentoHeader() {
+  const h = state.regolamento.header;
+  return `
+    <div class="header">
+      <div class="header-left">
+        <div class="header-badge regolamento-badge">${escapeHtml(h.icon)}</div>
+        <div>
+          <div class="header-title">${escapeHtml(h.title)}</div>
+          <div class="header-sub">${escapeHtml(h.subtitle)}</div>
+        </div>
+      </div>
+      <div class="header-stamp">${escapeHtml(h.stamp)}</div>
+    </div>`;
+}
+
+function renderRegolamentoSection(section, si, filters) {
+  const q = filters.query;
+  const items = section.items
+    .map((item, ii) => {
+      const hit = regolamentoItemMatches(item, section, si, filters);
+      if ((filters.query || filters.section !== 'all') && !hit) return '';
+      const hl = (text) => (q ? highlightHtml(text, q) : escapeHtml(text));
+      return `
+        <li class="regolamento-item ${hit && q ? 'search-hit' : ''}" id="reg-item-${si}-${ii}">
+          ${item.num ? `<span class="regolamento-num">${hl(item.num)}.</span>` : ''}
+          <span class="regolamento-text">${hl(item.text)}</span>
+        </li>`;
+    })
+    .filter(Boolean)
+    .join('');
+
+  const visible = filters.query || filters.section !== 'all'
+    ? section.items.some((item) => regolamentoItemMatches(item, section, si, filters))
+    : true;
+  if (!visible) return '';
+
+  return `
+    <div class="section regolamento-section" data-section-index="${si}">
+      <div class="section-head">
+        <div class="section-num">${escapeHtml(section.num)}</div>
+        <div class="section-title">${escapeHtml(section.title)}</div>
+        <div class="section-line"></div>
+      </div>
+      <ol class="regolamento-list">${items}</ol>
+    </div>`;
+}
+
+function renderRegolamento() {
+  if (!state.regolamento) return;
+  const filters = regolamentoFilters();
+  const root = document.getElementById('app-root');
+  updateRegolamentoSearchCount(filters);
+
+  let sectionsHtml = state.regolamento.sections
+    .map((section, si) => renderRegolamentoSection(section, si, filters))
+    .join('');
+
+  const hasFilters = Boolean(filters.query) || filters.section !== 'all';
+  if (hasFilters && !sectionsHtml.trim()) {
+    sectionsHtml = `<div class="search-empty">Nessun risultato con i filtri attivi.</div>`;
+  }
+
+  const sourceLink = state.regolamento.sourceUrl
+    ? `<a class="regolamento-source" href="${escapeHtml(state.regolamento.sourceUrl)}" target="_blank" rel="noopener noreferrer">Apri documento originale su Google Docs</a>`
+    : '';
+
+  root.innerHTML = `
+    ${renderRegolamentoHeader()}
+    ${hasFilters ? '' : `<div class="regolamento-intro">${escapeHtml(state.regolamento.intro)}</div>`}
+    ${sectionsHtml}
+    ${hasFilters ? '' : `<div class="footer regolamento-footer">
+      <span>${escapeHtml(state.regolamento.footer)}</span>
+      ${sourceLink}
+    </div>`}
+  `;
+
+  if (filters.query) scrollToFirstHit();
+}
+
+function updateToolbarForPage() {
+  const isManual = state.page === 'manual';
+  document.body.classList.toggle('page-manual', isManual);
+  document.body.classList.toggle('page-regolamento', !isManual);
+  document.getElementById('btn-page-manual')?.classList.toggle('active', isManual);
+  document.getElementById('btn-page-regolamento')?.classList.toggle('active', !isManual);
+
+  const manualOnly = [
+    'btn-view-quick',
+    'btn-calculator',
+    'btn-edit',
+    'btn-save',
+    'btn-export',
+    'btn-import',
+    'btn-reset',
+  ];
+  manualOnly.forEach((id) => {
+    document.getElementById(id)?.classList.toggle('hidden', !isManual);
+  });
+
+  document.querySelector('.filter-group-pills')?.classList.toggle('hidden', !isManual);
+  document.getElementById('manual-meta')?.classList.toggle('hidden', !isManual || !state.manualMeta?.updatedAt);
+
+  const search = document.getElementById('search-input');
+  if (search) {
+    search.placeholder = isManual
+      ? 'Cerca regola, codice o sanzione...'
+      : 'Cerca nel regolamento...';
+  }
+}
+
+function switchPage(page) {
+  if (state.page === page) return;
+  state.page = page;
+  state.searchFilters.section = 'all';
+  state.viewMode = 'full';
+  state.editing = false;
+  document.body.classList.remove('editing');
+  document.getElementById('toolbar')?.classList.remove('editing');
+  document.getElementById('btn-save')?.classList.add('hidden');
+  document.getElementById('btn-edit').textContent = 'Modifica';
+  document.getElementById('btn-view-quick').textContent = 'Consultazione rapida';
+  updateToolbarForPage();
+  populateSectionFilter();
+  render();
+}
+
 function render() {
+  if (state.page === 'regolamento') {
+    renderRegolamento();
+    return;
+  }
+
   if (!state.data) return;
   const filters = activeFilters();
   const root = document.getElementById('app-root');
@@ -1114,6 +1302,8 @@ async function applyUserState() {
     updateAdminUi();
     setAuthView('app');
     await loadManual();
+    loadRegolamento();
+    updateToolbarForPage();
     render();
     return;
   }
@@ -1483,6 +1673,8 @@ async function init() {
     else toast('Sessione scaduta — accedi di nuovo');
   });
   document.getElementById('btn-admin').addEventListener('click', openAdminPanel);
+  document.getElementById('btn-page-manual').addEventListener('click', () => switchPage('manual'));
+  document.getElementById('btn-page-regolamento').addEventListener('click', () => switchPage('regolamento'));
   document.getElementById('form-login').addEventListener('submit', submitLogin);
   document.getElementById('form-register').addEventListener('submit', submitRegister);
   document.querySelectorAll('.auth-tab').forEach((btn) => {

@@ -375,6 +375,33 @@ body.auth-mode { padding-top: 0; }
   padding-top: 12px;
   padding-bottom: 12px;
   background: rgba(248, 245, 239, 0.65);
+  flex-wrap: wrap;
+}
+
+.toolbar-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.tb-btn-nav {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.tb-btn-nav:hover {
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.tb-btn-nav.active {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+  box-shadow: var(--shadow-sm);
 }
 
 .toolbar-inner {
@@ -1707,4 +1734,82 @@ body.editing .item-del { display: inline-flex; }
   body { padding-top: 0; background: #fff; }
   .toolbar, .edit-only, .row-actions, .add-row-btn, .item-del, .app-body { padding: 0; background: #fff; }
   .doc-sheet { box-shadow: none; border: none; padding: 20px; }
+}
+
+/* ═══════════════════════════════════════
+   REGOLAMENTO
+   ═══════════════════════════════════════ */
+.regolamento-badge {
+  background: linear-gradient(145deg, #7c2d12, var(--accent));
+}
+
+.regolamento-intro {
+  margin-bottom: 36px;
+  padding: 20px 24px;
+  background: var(--surface-soft);
+  border: 1px solid var(--line-soft);
+  border-left: 4px solid var(--accent);
+  border-radius: var(--radius-md);
+  color: var(--ink-mid);
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.regolamento-list {
+  list-style: none;
+  margin: 0 0 8px;
+  padding: 0;
+}
+
+.regolamento-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line-soft);
+  line-height: 1.65;
+}
+
+.regolamento-item:last-child {
+  border-bottom: none;
+}
+
+.regolamento-num {
+  flex-shrink: 0;
+  min-width: 28px;
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.regolamento-text {
+  flex: 1;
+  color: var(--ink-mid);
+}
+
+.regolamento-section {
+  margin-bottom: 36px;
+}
+
+.regolamento-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.regolamento-source {
+  color: var(--brand);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.regolamento-source:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.page-regolamento .toolbar-tools .hidden {
+  display: none !important;
 }
