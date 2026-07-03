@@ -1813,3 +1813,68 @@ body.editing .item-del { display: inline-flex; }
 .page-regolamento .toolbar-tools .hidden {
   display: none !important;
 }
+
+.rule-row-linkable {
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.rule-row-linkable:hover {
+  background: rgba(180, 83, 9, 0.06);
+}
+
+.rule-row-linkable:active {
+  background: rgba(180, 83, 9, 0.1);
+}
+
+.regolamento-item-target {
+  background: var(--accent-soft);
+  border-radius: var(--radius-sm);
+  padding-left: 12px;
+  padding-right: 12px;
+  margin-left: -12px;
+  margin-right: -12px;
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.regolamento-link-modal {
+  max-width: 520px;
+}
+
+.regolamento-link-intro {
+  color: var(--ink-mid);
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+
+.regolamento-link-list {
+  list-style: none;
+  margin: 0 0 20px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 280px;
+  overflow: auto;
+}
+
+.regolamento-link-preview {
+  padding: 12px 14px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-sm);
+  background: var(--surface-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.regolamento-link-preview strong {
+  color: var(--brand);
+  font-size: 13px;
+}
+
+.regolamento-link-preview span {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}

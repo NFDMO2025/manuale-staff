@@ -2,6 +2,7 @@ const state = {
   data: null,
   regolamento: null,
   page: 'manual',
+  regolamentoHighlight: null,
   editing: false,
   search: '',
   searchFilters: { section: 'all', sanction: 'all' },
@@ -250,8 +251,9 @@ function renderRuleRow(rule, si, ri, filters) {
   const hit = ruleMatches(rule, state.data.sections[si], si, filters);
   if (hasActiveFilters(filters) && !hit) return '';
   const hl = (text) => (q ? highlightHtml(text, q) : escapeHtml(text));
+  const hasRegLink = !state.editing && getRegolamentoLinksForRule(rule).length > 0;
   return `
-    <tr class="${rule.highlight ? 'highlight' : ''} ${hit && q ? 'search-hit' : ''}" data-section="${si}" data-rule="${ri}" id="rule-${si}-${ri}">
+    <tr class="${rule.highlight ? 'highlight' : ''} ${hit && q ? 'search-hit' : ''} ${hasRegLink ? 'rule-row-linkable' : ''}" data-section="${si}" data-rule="${ri}" id="rule-${si}-${ri}" ${hasRegLink ? 'title="Clicca per aprire il regolamento collegato"' : ''}>
       <td data-label="Regola"><span class="rule-code editable" data-edit="rule-code-${si}-${ri}">${hl(rule.code)}</span></td>
       <td data-label="Violazione"><span class="rule-name editable" data-edit="rule-name-${si}-${ri}">${hl(rule.name)}</span></td>
       <td data-label="Descrizione" class="rule-desc editable" data-edit="rule-desc-${si}-${ri}">${hl(rule.desc)}</td>
@@ -331,19 +333,19 @@ function renderChecklist() {
 function renderQuickView(filters) {
   const groups = state.data.sections
     .map((section, si) => {
-      const rules = section.rules.filter((rule) => ruleMatches(rule, section, si, filters));
-      if (!rules.length) return '';
-      const rows = rules
-        .map((rule) => {
+      const rows = section.rules
+        .map((rule, ri) => {
+          if (!ruleMatches(rule, section, si, filters)) return '';
           const sanctions = (rule.sanctions || []).join(' · ') || '—';
           return `
-            <tr class="quick-row ${rule.highlight ? 'highlight' : ''}">
+            <tr class="quick-row ${rule.highlight ? 'highlight' : ''} ${!state.editing && getRegolamentoLinksForRule(rule).length ? 'rule-row-linkable' : ''}" data-section="${si}" data-rule="${ri}">
               <td><span class="rule-code">${escapeHtml(rule.code)}</span></td>
               <td><span class="rule-name">${escapeHtml(rule.name)}</span></td>
               <td>${renderPills(rule.sanctions)}</td>
               <td class="quick-rec">${escapeHtml(rule.recidiva || '—')}</td>
             </tr>`;
         })
+        .filter(Boolean)
         .join('');
       return `
         <div class="quick-section">
@@ -372,6 +374,117 @@ function regolamentoFilters() {
     query: state.search.trim().toLowerCase(),
     section: state.searchFilters.section,
   };
+}
+
+function getRegolamentoLinksForRule(rule) {
+  if (!rule || !state.regolamento || typeof RuleRegolamentoLinks === 'undefined') return [];
+  return RuleRegolamentoLinks.getLinksForRule(rule, state.regolamento);
+}
+
+function isRegolamentoTarget(si, ii) {
+  return state.regolamentoHighlight?.some((t) => t.si === si && t.ii === ii);
+}
+
+function openRegolamentoLinkModal(rule) {
+  const links = getRegolamentoLinksForRule(rule);
+  if (!links.length) {
+    toast('Nessun collegamento al regolamento per questa regola');
+    return;
+  }
+
+  closeModal();
+  const preview = links
+    .map(
+      (link) => `
+      <li class="regolamento-link-preview">
+        <strong>${escapeHtml(link.label)}</strong>
+        <span>${escapeHtml(RuleRegolamentoLinks.previewText(link.text))}</span>
+      </li>`
+    )
+    .join('');
+
+  const backdrop = document.createElement('div');
+  backdrop.className = 'modal-backdrop';
+  backdrop.innerHTML = `
+    <div class="modal regolamento-link-modal">
+      <h3>Vai al regolamento?</h3>
+      <p class="regolamento-link-intro">
+        La regola <strong>${escapeHtml(rule.code)} — ${escapeHtml(rule.name)}</strong>
+        è collegata a ${links.length} voce${links.length === 1 ? '' : 'i'} del regolamento ufficiale.
+      </p>
+      <ul class="regolamento-link-list">${preview}</ul>
+      <div class="modal-actions">
+        <button type="button" class="tb-btn tb-btn-primary" id="modal-goto-regolamento">Apri regolamento</button>
+        <button type="button" class="tb-btn tb-btn-soft" id="modal-cancel">Annulla</button>
+      </div>
+    </div>`;
+  document.body.appendChild(backdrop);
+  state.modal = backdrop;
+
+  backdrop.querySelector('#modal-cancel').onclick = closeModal;
+  backdrop.querySelector('#modal-goto-regolamento').onclick = () => {
+    closeModal();
+    goToRegolamentoLinks(links);
+  };
+  backdrop.addEventListener('click', (ev) => {
+    if (ev.target === backdrop) closeModal();
+  });
+}
+
+function goToRegolamentoLinks(links) {
+  if (!links.length) return;
+  state.regolamentoHighlight = links.map(({ si, ii }) => ({ si, ii }));
+  state.search = '';
+  state.searchFilters.section = 'all';
+  document.getElementById('search-input').value = '';
+
+  if (state.page !== 'regolamento') {
+    state.page = 'regolamento';
+    state.viewMode = 'full';
+    state.editing = false;
+    document.body.classList.remove('editing');
+    document.getElementById('toolbar')?.classList.remove('editing');
+    document.getElementById('btn-save')?.classList.add('hidden');
+    document.getElementById('btn-edit').textContent = 'Modifica';
+    document.getElementById('btn-view-quick').textContent = 'Consultazione rapida';
+    updateToolbarForPage();
+    populateSectionFilter();
+  }
+
+  render();
+  scrollToRegolamentoHighlight();
+  toast(`Regolamento · ${links[0].label}`);
+}
+
+function scrollToRegolamentoHighlight() {
+  requestAnimationFrame(() => {
+    const target = state.regolamentoHighlight?.[0];
+    if (!target) return;
+    const el = document.getElementById(`reg-item-${target.si}-${target.ii}`);
+    el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+}
+
+function clearRegolamentoHighlightLater() {
+  if (!state.regolamentoHighlight) return;
+  clearTimeout(clearRegolamentoHighlightLater._t);
+  clearRegolamentoHighlightLater._t = setTimeout(() => {
+    state.regolamentoHighlight = null;
+    if (state.page === 'regolamento') renderRegolamento();
+  }, 12000);
+}
+
+function onRuleRowClick(e) {
+  if (state.editing || state.page !== 'manual') return;
+  if (e.target.closest('.mini-btn, .row-actions, .editable')) return;
+
+  const row = e.currentTarget;
+  const si = Number(row.dataset.section);
+  const ri = Number(row.dataset.rule);
+  const rule = state.data?.sections?.[si]?.rules?.[ri];
+  if (!rule) return;
+
+  openRegolamentoLinkModal(rule);
 }
 
 function regolamentoItemMatches(item, section, si, filters) {
@@ -424,7 +537,7 @@ function renderRegolamentoSection(section, si, filters) {
       if ((filters.query || filters.section !== 'all') && !hit) return '';
       const hl = (text) => (q ? highlightHtml(text, q) : escapeHtml(text));
       return `
-        <li class="regolamento-item ${hit && q ? 'search-hit' : ''}" id="reg-item-${si}-${ii}">
+        <li class="regolamento-item ${hit && q ? 'search-hit' : ''} ${isRegolamentoTarget(si, ii) ? 'regolamento-item-target' : ''}" id="reg-item-${si}-${ii}">
           ${item.num ? `<span class="regolamento-num">${hl(item.num)}.</span>` : ''}
           <span class="regolamento-text">${hl(item.text)}</span>
         </li>`;
@@ -478,6 +591,7 @@ function renderRegolamento() {
   `;
 
   if (filters.query) scrollToFirstHit();
+  if (state.regolamentoHighlight?.length) clearRegolamentoHighlightLater();
 }
 
 function updateToolbarForPage() {
@@ -517,6 +631,7 @@ function switchPage(page) {
   state.searchFilters.section = 'all';
   state.viewMode = 'full';
   state.editing = false;
+  state.regolamentoHighlight = null;
   document.body.classList.remove('editing');
   document.getElementById('toolbar')?.classList.remove('editing');
   document.getElementById('btn-save')?.classList.add('hidden');
@@ -544,6 +659,7 @@ function render() {
 
   if (state.viewMode === 'quick') {
     root.innerHTML = renderQuickView(filters);
+    bindRuleLinkEvents();
     return;
   }
 
@@ -631,6 +747,14 @@ function bindEvents() {
       alerts: [],
     });
     render();
+  });
+
+  bindRuleLinkEvents();
+}
+
+function bindRuleLinkEvents() {
+  document.querySelectorAll('.rule-row-linkable[data-section][data-rule]').forEach((row) => {
+    row.addEventListener('click', onRuleRowClick);
   });
 }
 
