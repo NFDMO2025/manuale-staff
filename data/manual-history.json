@@ -1,0 +1,436 @@
+{
+  "entries": [
+    {
+      "id": 1,
+      "data": {
+        "header": {
+          "icon": "MS",
+          "title": "Manuale Sanzioni Staff",
+          "subtitle": "Pannello operativo — uso interno riservato",
+          "stamp": "USO RISERVATO"
+        },
+        "legend": [
+          {
+            "type": "g",
+            "label": "WARN 1 / 2",
+            "desc": "Avvertimento. Al 2° si scala di livello."
+          },
+          {
+            "type": "o",
+            "label": "BAN 24H – 48H",
+            "desc": "Ban breve. Infrazioni medie o prime recidive."
+          },
+          {
+            "type": "r",
+            "label": "BAN 3 – 7 GG",
+            "desc": "Ban esteso. Violazioni gravi o recidive."
+          },
+          {
+            "type": "p",
+            "label": "PERMABAN",
+            "desc": "Irrevocabile. Solo senior staff può revocare."
+          }
+        ],
+        "sections": [
+          {
+            "num": "1",
+            "title": "Comportamento Roleplay",
+            "rules": [
+              {
+                "code": "1.1",
+                "name": "Fail RP",
+                "desc": "Comportamento non conforme al personaggio o alla situazione roleplay.",
+                "sanctions": [
+                  "WARN 1°",
+                  "WARN 2°"
+                ],
+                "recidiva": "3ª volta → BAN 24H",
+                "highlight": false
+              },
+              {
+                "code": "1.3 + 2.22",
+                "name": "Powergame",
+                "desc": "Forzare azioni sul personaggio altrui o sfruttare meccaniche in modo sleale.",
+                "sanctions": [
+                  "WARN 1°",
+                  "WARN 2°"
+                ],
+                "recidiva": "BAN 24H",
+                "highlight": false
+              },
+              {
+                "code": "1.5",
+                "name": "VDM / RDM",
+                "desc": "Uccidere o investire altri giocatori senza valida motivazione RP.",
+                "sanctions": [
+                  "BAN 24H"
+                ],
+                "recidiva": "se intenzionale → BAN 3–7 GG",
+                "highlight": false
+              },
+              {
+                "code": "1.7",
+                "name": "Revenge Kill",
+                "desc": "Tornare a colpire chi vi ha eliminato sfruttando la memoria fuori RP.",
+                "sanctions": [
+                  "BAN 24H"
+                ],
+                "recidiva": "—",
+                "highlight": false
+              },
+              {
+                "code": "1.8",
+                "name": "Bug Abusing",
+                "desc": "Sfruttare bug o glitch del gioco per ottenere vantaggi.",
+                "sanctions": [
+                  "BAN 3 GG"
+                ],
+                "recidiva": "se grave → PERMABAN",
+                "highlight": false
+              },
+              {
+                "code": "1.9",
+                "name": "Mix Chat",
+                "desc": "Usare informazioni della chat OOC all'interno del roleplay.",
+                "sanctions": [
+                  "WARN 1°"
+                ],
+                "recidiva": "BAN 24H",
+                "highlight": false
+              },
+              {
+                "code": "1.10",
+                "name": "Metagame",
+                "desc": "Usare info esterne al personaggio (stream, Discord, ecc.) nel RP.",
+                "sanctions": [
+                  "BAN 3 GG"
+                ],
+                "recidiva": "7 GG / PERMABAN",
+                "highlight": false
+              },
+              {
+                "code": "1.11",
+                "name": "Combat Log",
+                "desc": "Disconnettersi o respawnare durante un'azione attiva.",
+                "sanctions": [
+                  "BAN 24H"
+                ],
+                "recidiva": "progressivo: 48H → +72H",
+                "highlight": false
+              }
+            ],
+            "alerts": [
+              {
+                "type": "r",
+                "title": "Progressione regola 1.11",
+                "body": "1ª recidiva = 48h · 2ª recidiva = 48h · dalla 3ª in poi ogni volta +72h sulla precedente. Documentate sempre con screenshot o log."
+              }
+            ]
+          },
+          {
+            "num": "2",
+            "title": "Azioni in Gioco e Comportamento",
+            "rules": [
+              {
+                "code": "2.1 + 6.3",
+                "name": "Loot Errato",
+                "desc": "Raccogliere oggetti non consentiti dalla situazione RP.",
+                "sanctions": [
+                  "WARN 1°"
+                ],
+                "recidiva": "—",
+                "highlight": false
+              },
+              {
+                "code": "2.1 + 6.2",
+                "name": "Azione a scopo di loot",
+                "desc": "Avviare un'azione con il solo fine di saccheggiare.",
+                "sanctions": [
+                  "WARN 1°",
+                  "WARN 2°"
+                ],
+                "recidiva": "—",
+                "highlight": false
+              },
+              {
+                "code": "2.6",
+                "name": "Azioni in safe zone",
+                "desc": "Compiere azioni ostili all'interno di zone protette.",
+                "sanctions": [
+                  "WARN 1°"
+                ],
+                "recidiva": "BAN 24H",
+                "highlight": false
+              },
+              {
+                "code": "2.10",
+                "name": "Respawn improprio",
+                "desc": "Utilizzare il respawn per aggirare situazioni RP svantaggiose.",
+                "sanctions": [
+                  "WARN 1°"
+                ],
+                "recidiva": "BAN 24H",
+                "highlight": false
+              },
+              {
+                "code": "2.11",
+                "name": "Comportamento discriminatorio",
+                "desc": "Qualsiasi comportamento sessista, discriminatorio o degradante verso altri giocatori.",
+                "sanctions": [
+                  "PERMABAN"
+                ],
+                "recidiva": "Irrevocabile — nessuna eccezione",
+                "highlight": true
+              },
+              {
+                "code": "2.12",
+                "name": "Furto veicoli d'emergenza",
+                "desc": "Sottrarre mezzi di polizia, ambulanza o pompieri.",
+                "sanctions": [
+                  "WARN 1°"
+                ],
+                "recidiva": "BAN 24H",
+                "highlight": false
+              },
+              {
+                "code": "2.15",
+                "name": "Alt abuse",
+                "desc": "Interazione tra personaggi dello stesso giocatore.",
+                "sanctions": [
+                  "BAN 24H"
+                ],
+                "recidiva": "BAN 48H",
+                "highlight": false
+              },
+              {
+                "code": "2.18",
+                "name": "Insulti a soggetto atterrato",
+                "desc": "Provocare o degradare chi è a terra o fuori combattimento.",
+                "sanctions": [
+                  "WARN 1°"
+                ],
+                "recidiva": "BAN 24H",
+                "highlight": false
+              }
+            ],
+            "alerts": []
+          },
+          {
+            "num": "3",
+            "title": "Eventi Organizzati",
+            "rules": [
+              {
+                "code": "3.5",
+                "name": "Azioni durante evento",
+                "desc": "Disturbare o interrompere eventi ufficiali con azioni ostili non autorizzate.",
+                "sanctions": [
+                  "WARN 1°",
+                  "WARN 2°"
+                ],
+                "recidiva": "BAN 24H",
+                "highlight": false
+              }
+            ],
+            "alerts": []
+          },
+          {
+            "num": "4",
+            "title": "Forze dell'Ordine (FDO)",
+            "rules": [
+              {
+                "code": "4.2",
+                "name": "Corruzione non autorizzata",
+                "desc": "Interpretare un agente corrotto senza approvazione staff.",
+                "sanctions": [
+                  "PERMABAN"
+                ],
+                "recidiva": "—",
+                "highlight": true
+              },
+              {
+                "code": "4.5",
+                "name": "Licenziamento FDO + uso info",
+                "desc": "Usare informazioni acquisite in servizio dopo il licenziamento.",
+                "sanctions": [
+                  "BAN 24H+",
+                  "WIPE",
+                  "7 GG LEGALE"
+                ],
+                "recidiva": "Escalation",
+                "highlight": false
+              },
+              {
+                "code": "4.11",
+                "name": "Police Bait",
+                "desc": "Provocare le FDO per innescare inseguimenti o situazioni forzate.",
+                "sanctions": [
+                  "WARN 1°"
+                ],
+                "recidiva": "BAN 24H",
+                "highlight": false
+              },
+              {
+                "code": "4.12",
+                "name": "Rapimento FDO / EMS",
+                "desc": "Sequestrare agenti o sanitari senza via libera staff.",
+                "sanctions": [
+                  "BAN 24H"
+                ],
+                "recidiva": "BAN 48H",
+                "highlight": false
+              }
+            ],
+            "alerts": [
+              {
+                "type": "o",
+                "title": "Nota — Regola 4.5",
+                "body": "Sanzione cumulativa: Ban 24h + Wipe inventario/denaro + 7 giorni di conseguenze legali in RP. Coordinate sempre con il senior staff prima di applicarla."
+              }
+            ]
+          },
+          {
+            "num": "6",
+            "title": "Combattimento e Tattiche",
+            "rules": [
+              {
+                "code": "6.3",
+                "name": "Nascondersi nei cespugli",
+                "desc": "Usare la vegetazione come copertura tattica abusiva.",
+                "sanctions": [
+                  "ANNULL. AZIONE"
+                ],
+                "recidiva": "—",
+                "highlight": false
+              },
+              {
+                "code": "6.5",
+                "name": "Sparare dal lato guida",
+                "desc": "Aprire il fuoco dal posto di guida di un veicolo.",
+                "sanctions": [
+                  "ANNULL. AZIONE"
+                ],
+                "recidiva": "—",
+                "highlight": false
+              },
+              {
+                "code": "6.16",
+                "name": "Criminali > 10",
+                "desc": "Partecipare a un'azione criminale con più di 10 persone. Rifarsi alla regola 6.21.",
+                "sanctions": [
+                  "AZIONE PERSA"
+                ],
+                "recidiva": "automatico, nessuna discrezionalità",
+                "highlight": false
+              },
+              {
+                "code": "6.20",
+                "name": "Uso caschi in azione",
+                "desc": "Indossare casco durante un'azione senza autorizzazione fazione.",
+                "sanctions": [
+                  "ANNULL. AZIONE",
+                  "RICHIAMO"
+                ],
+                "recidiva": "—",
+                "highlight": false
+              },
+              {
+                "code": "6.23",
+                "name": "Utilizzo tetti",
+                "desc": "Sparare o appostarsi sui tetti durante le azioni.",
+                "sanctions": [
+                  "WARN 1°"
+                ],
+                "recidiva": "BAN 24H",
+                "highlight": false
+              }
+            ],
+            "alerts": [
+              {
+                "type": "b",
+                "title": "Annullamento azione — come applicarlo",
+                "body": "L'intera sequenza di eventi viene invalidata retroattivamente: niente loot, nessun risultato RP. Informatene tutte le parti coinvolte prima di procedere."
+              }
+            ]
+          },
+          {
+            "num": "7",
+            "title": "EMS / Servizi di Emergenza",
+            "rules": [
+              {
+                "code": "7.2",
+                "name": "/ambulanza",
+                "desc": "Usare il comando senza poi spawnare in ospedale a fine azione.",
+                "sanctions": [
+                  "WARN 1°"
+                ],
+                "recidiva": "—",
+                "highlight": false
+              },
+              {
+                "code": "7.5",
+                "name": "Ritorno campi < 30 min",
+                "desc": "Rientrare in zona operativa prima del tempo minimo obbligatorio.",
+                "sanctions": [
+                  "RICHIAMO FAZIONE"
+                ],
+                "recidiva": "—",
+                "highlight": false
+              },
+              {
+                "code": "7.8",
+                "name": "Campi di raccolta",
+                "desc": "Presenza non autorizzata nelle aree di raccolta risorse.",
+                "sanctions": [
+                  "RICHIAMO FAZIONE"
+                ],
+                "recidiva": "—",
+                "highlight": false
+              }
+            ],
+            "alerts": []
+          },
+          {
+            "num": "9",
+            "title": "Criminalità Organizzata",
+            "rules": [
+              {
+                "code": "9.10",
+                "name": "Ostaggio NPC",
+                "desc": "Prendere in ostaggio personaggi non giocanti. L'azione rimane comunque valida.",
+                "sanctions": [
+                  "WARN 1°"
+                ],
+                "recidiva": "—",
+                "highlight": false
+              },
+              {
+                "code": "9.13",
+                "name": "Gang — rapine vietate",
+                "desc": "Partecipare a rapine con una gang non autorizzata.",
+                "sanctions": [
+                  "RICHIAMO FAZIONE"
+                ],
+                "recidiva": "—",
+                "highlight": false
+              }
+            ],
+            "alerts": []
+          }
+        ],
+        "checklist": [
+          "Identificate con precisione la regola violata e il suo numero.",
+          "Verificate se è un primo episodio o una recidiva — controllate lo storico sanzioni.",
+          "Raccogliete le prove: screenshot, clip video, log di chat. Prima di procedere.",
+          "Applicate la sanzione corretta secondo questo manuale, senza aumentarla arbitrariamente.",
+          "Per PERMABAN e sanzioni complesse (es. 4.5) consultate sempre Head Admin/ admin",
+          "Documentate nel sistema interno: regola violata, prova, sanzione applicata."
+        ],
+        "footer": "Documento riservato allo staff · Aggiornare in caso di modifiche al regolamento"
+      },
+      "updated_at": 1782759667028,
+      "updated_by": "criroma1900",
+      "saved_at": 1783117495689
+    }
+  ],
+  "nextId": 2
+}
