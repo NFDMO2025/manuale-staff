@@ -1,7 +1,7 @@
 {
-  "name": "manuale-staff",
-  "version": "1.0.0",
-  "description": "Manuale sanzioni staff con registrazione staff e gestione accessi",
+  "name": "denuncia-sociale",
+  "version": "2.0.0",
+  "description": "Sito pubblico Denuncia Sociale con archivio video e sezioni cliccabili",
   "main": "server/index.js",
   "scripts": {
     "start": "node server/index.js",

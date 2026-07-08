@@ -1,0 +1,46 @@
+{
+  "site": {
+    "title": "Denuncia Sociale",
+    "subtitle": "Archivio pubblico di prove e clip",
+    "description": "Documentazione pubblica di decisioni discutibili dello staff, assistenze penose, insulti e comportamenti tossici riversati sui giocatori.",
+    "disclaimer": "Contenuti derivati da clip e registrazioni presenti nella cartella Video. Nessun login richiesto."
+  },
+  "categories": [
+    {
+      "id": "assistenze",
+      "label": "Assistenze penose",
+      "icon": "AP",
+      "description": "Ticket, assistenze e gestioni discutibili da parte dello staff.",
+      "keywords": ["assistenza", "ticket", "supporto", "penosa", "penoso"]
+    },
+    {
+      "id": "insulti",
+      "label": "Insulti e tossicità",
+      "icon": "IT",
+      "description": "Insulti, provocazioni e comportamenti degradanti verso i giocatori.",
+      "keywords": ["insult", "insulti", "tossic", "offes", "provoc", "umiliaz"]
+    },
+    {
+      "id": "decisioni",
+      "label": "Decisioni pessime",
+      "icon": "DP",
+      "description": "Sanzioni arbitrarie, ban ingiustificati e scelte discutibili dello staff.",
+      "keywords": ["ban", "sanzion", "decision", "staff", "permaban", "warn"]
+    },
+    {
+      "id": "rp",
+      "label": "Fail RP staff",
+      "icon": "FR",
+      "description": "Comportamenti fuori ruolo e incoerenze nelle azioni dello staff.",
+      "keywords": ["fail", "powergame", "metagame", "rdm", "vdm", "combat"]
+    },
+    {
+      "id": "altro",
+      "label": "Altri episodi",
+      "icon": "AE",
+      "description": "Clip e registrazioni che non rientrano nelle altre categorie.",
+      "keywords": []
+    }
+  ],
+  "defaultCategory": "altro"
+}

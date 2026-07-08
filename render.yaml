@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: manuale-staff
+    name: denuncia-sociale
     runtime: node
     plan: free
     buildCommand: npm install
@@ -8,11 +8,3 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
-      - key: JWT_SECRET
-        generateValue: true
-      - key: ADMIN_USERNAME
-        value: admin
-      - key: ADMIN_PASSWORD
-        generateValue: true
-      - key: ADMIN_NAME
-        value: Amministratore

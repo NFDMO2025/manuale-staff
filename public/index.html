@@ -3,163 +3,87 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Manuale Sanzioni Staff</title>
+  <title>Denuncia Sociale</title>
+  <meta name="description" content="Archivio pubblico di prove e clip su decisioni discutibili dello staff.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/app.css?v=11">
-  <link rel="stylesheet" href="css/trap.css?v=3">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/denunce.css?v=1">
 </head>
 <body>
-  <div id="auth-screen" class="login-screen hidden">
-    <div class="login-bg" aria-hidden="true"></div>
-    <div class="login-shell">
-      <aside class="login-side">
-        <div class="login-brand">
-          <span class="login-mark">MS</span>
-          <div>
-            <p class="login-brand-name">Manuale Staff</p>
-            <p class="login-brand-sub">Regolamento sanzioni</p>
-          </div>
+  <div class="noise" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <span class="brand-mark">DS</span>
+        <div>
+          <p class="brand-kicker">Archivio pubblico</p>
+          <h1 class="brand-title" id="site-title">Denuncia Sociale</h1>
         </div>
-        <blockquote class="login-quote">
-          Consultazione e aggiornamento del regolamento disciplinare, riservato allo staff autorizzato.
-        </blockquote>
-        <ul class="login-features">
-          <li><span class="login-feature-dot"></span>Accesso controllato e approvazione admin</li>
-          <li><span class="login-feature-dot"></span>Manuale condiviso aggiornato in tempo reale</li>
-          <li><span class="login-feature-dot"></span>Consultazione rapida di regole e sanzioni</li>
-        </ul>
-      </aside>
-      <div class="login-card">
-        <p class="login-kicker" id="auth-message">Accedi o registrati</p>
-        <h1 class="login-title">Benvenuto</h1>
+      </div>
+      <div class="topbar-actions">
+        <input type="search" id="search-input" class="search-input" placeholder="Cerca clip, categoria, file...">
+        <button type="button" class="btn btn-ghost" id="btn-reset-filters">Tutte</button>
+      </div>
+    </div>
+  </header>
 
-        <div id="auth-forms">
-          <div class="auth-tabs">
-            <button type="button" class="auth-tab active" data-tab="login">Accedi</button>
-            <button type="button" class="auth-tab" data-tab="register">Registrati</button>
-          </div>
+  <main class="page">
+    <section class="hero" id="hero">
+      <div class="hero-copy">
+        <p class="hero-eyebrow">Prove · Clip · Registrazioni</p>
+        <h2 class="hero-title" id="hero-title">Denuncia Sociale</h2>
+        <p class="hero-sub" id="hero-sub">Caricamento contenuti...</p>
+        <p class="hero-desc" id="hero-desc"></p>
+      </div>
+      <div class="hero-stats" id="hero-stats"></div>
+    </section>
 
-          <form id="form-login" class="auth-form" autocomplete="on">
-            <label for="login-username">Username</label>
-            <input type="text" id="login-username" name="username" required autocomplete="username" placeholder="Il tuo username staff">
-            <label for="login-password">Password</label>
-            <input type="password" id="login-password" name="password" required autocomplete="current-password" placeholder="••••••••">
-            <button type="submit" class="btn btn-primary btn-block">Entra</button>
-          </form>
+    <section class="category-nav" id="category-nav" aria-label="Categorie"></section>
 
-          <form id="form-register" class="auth-form hidden" autocomplete="on">
-            <label for="reg-name">Nome visualizzato</label>
-            <input type="text" id="reg-name" name="name" required placeholder="Es. Mario Rossi" autocomplete="name">
-            <label for="reg-username">Username</label>
-            <input type="text" id="reg-username" name="username" required pattern="[a-zA-Z0-9_]{3,32}" autocomplete="username" placeholder="min. 3 caratteri">
-            <label for="reg-password">Password</label>
-            <input type="password" id="reg-password" name="password" required minlength="6" autocomplete="new-password" placeholder="min. 6 caratteri">
-            <p class="auth-hint">Un amministratore dovrà approvare il tuo account prima dell'accesso completo.</p>
-            <button type="submit" class="btn btn-primary btn-block">Crea account</button>
-          </form>
+    <section class="content">
+      <div class="content-head">
+        <div>
+          <p class="content-kicker">Sezione attiva</p>
+          <h3 class="content-title" id="active-category-title">Tutte le clip</h3>
+          <p class="content-desc" id="active-category-desc">Esplora l'archivio completo.</p>
         </div>
+        <p class="content-count" id="result-count"></p>
+      </div>
 
-        <div id="auth-user-pending" class="hidden">
-          <div class="auth-status-box auth-pending-box">
-            <p class="auth-box-label">Stato account</p>
-            <p class="auth-box-title">In attesa di approvazione</p>
-            <p class="auth-email" id="pending-username"></p>
-            <p class="auth-hint">Riceverai accesso non appena un admin confermerà la richiesta.</p>
-          </div>
-          <button type="button" class="btn btn-secondary btn-block" id="btn-check-pending">Controlla di nuovo</button>
-          <button type="button" class="btn btn-ghost btn-block" id="btn-logout-pending">Esci</button>
-        </div>
+      <div class="clip-grid" id="clip-grid"></div>
+      <div class="empty-state hidden" id="empty-state">
+        <h4>Nessuna clip trovata</h4>
+        <p>Prova un'altra categoria o modifica la ricerca.</p>
+      </div>
+    </section>
 
-        <div id="auth-user-denied" class="hidden">
-          <div class="auth-status-box auth-denied-box">
-            <p class="auth-box-label">Stato account</p>
-            <p class="auth-box-title">Accesso negato</p>
-            <p class="auth-email" id="denied-username"></p>
-            <p class="auth-hint">Contatta un amministratore se ritieni ci sia un errore.</p>
-          </div>
-          <button type="button" class="btn btn-ghost btn-block" id="btn-logout-denied">Esci</button>
-        </div>
+    <footer class="footer">
+      <p id="site-disclaimer">Contenuti derivati dalla cartella Video.</p>
+      <p class="footer-meta" id="generated-at"></p>
+    </footer>
+  </main>
 
-        <p id="auth-error" class="login-error hidden"></p>
+  <div class="modal-backdrop hidden" id="video-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal">
+      <button type="button" class="modal-close" id="modal-close" aria-label="Chiudi">×</button>
+      <div class="modal-head">
+        <p class="modal-kicker" id="modal-category"></p>
+        <h3 class="modal-title" id="modal-title"></h3>
+        <p class="modal-meta" id="modal-meta"></p>
+      </div>
+      <div class="modal-player-wrap">
+        <video id="modal-video" class="modal-video" controls playsinline preload="metadata"></video>
+      </div>
+      <div class="modal-foot">
+        <p class="modal-file" id="modal-file"></p>
       </div>
     </div>
   </div>
 
-  <div id="main-app" class="hidden">
-    <header class="toolbar" id="toolbar">
-      <div class="toolbar-shell">
-        <div class="toolbar-row toolbar-row-main">
-          <div class="toolbar-brand">
-            <span class="toolbar-mark">MS</span>
-            <div class="toolbar-brand-text">
-              <span class="toolbar-title">Manuale Sanzioni</span>
-              <span class="toolbar-sub">Pannello staff</span>
-            </div>
-          </div>
-          <div class="toolbar-search-wrap">
-            <input type="search" class="toolbar-search" id="search-input" placeholder="Cerca regola, codice o sanzione...">
-            <span class="search-count hidden" id="search-count"></span>
-          </div>
-          <div class="toolbar-user">
-            <div class="user-chip" id="user-chip"></div>
-            <button type="button" class="tb-btn tb-btn-soft" id="btn-logout">Esci</button>
-          </div>
-        </div>
+  <div class="toast hidden" id="toast"></div>
 
-        <div class="toolbar-row toolbar-row-tools">
-          <div class="toolbar-nav" id="toolbar-nav">
-            <button type="button" class="tb-btn tb-btn-nav active" id="btn-page-manual">Manuale sanzioni</button>
-            <button type="button" class="tb-btn tb-btn-nav" id="btn-page-regolamento">Regolamento</button>
-          </div>
-          <div class="toolbar-tools">
-            <button type="button" class="tb-btn tb-btn-soft" id="btn-view-quick">Consultazione rapida</button>
-            <button type="button" class="tb-btn tb-btn-soft" id="btn-calculator">Calcolatore</button>
-            <button type="button" class="tb-btn tb-btn-soft" id="btn-history">Storico</button>
-            <span class="toolbar-divider"></span>
-            <button type="button" class="tb-btn tb-btn-soft hidden" id="btn-admin">Accessi</button>
-            <button type="button" class="tb-btn tb-btn-soft tb-btn-edit" id="btn-edit">Modifica</button>
-            <button type="button" class="tb-btn tb-btn-primary hidden" id="btn-save">Salva</button>
-            <span class="toolbar-divider"></span>
-            <button type="button" class="tb-btn tb-btn-soft" id="btn-export">Esporta</button>
-            <button type="button" class="tb-btn tb-btn-soft" id="btn-import">Importa</button>
-            <button type="button" class="tb-btn tb-btn-soft" id="btn-reset">Ripristina</button>
-          </div>
-        </div>
-
-        <div class="toolbar-filters" id="toolbar-filters">
-          <div class="filter-group">
-            <label for="filter-section">Sezione</label>
-            <select id="filter-section" class="filter-select">
-              <option value="all">Tutte le sezioni</option>
-            </select>
-          </div>
-          <div class="filter-group filter-group-pills">
-            <span class="filter-label">Tipo sanzione</span>
-            <div class="filter-pills" id="filter-sanction-pills"></div>
-          </div>
-        </div>
-
-        <div class="manual-meta hidden" id="manual-meta"></div>
-      </div>
-      <input type="file" id="import-file" accept=".json" class="hidden">
-    </header>
-
-    <div class="app-body">
-      <main class="page">
-        <div class="doc-sheet" id="app-root"></div>
-      </main>
-    </div>
-  </div>
-
-  <div id="toast" class="toast hidden"></div>
-
-  <script src="js/trap.js?v=5"></script>
-  <script src="js/default-data.js"></script>
-  <script src="js/default-regolamento-data.js"></script>
-  <script src="js/rule-regolamento-links.js"></script>
-  <script src="js/rule-utils.js"></script>
-  <script src="js/app.js?v=14"></script>
+  <script src="js/denunce-app.js?v=1"></script>
 </body>
 </html>
