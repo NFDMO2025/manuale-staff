@@ -115,11 +115,11 @@
       "username": "nina",
       "password_hash": "$2a$10$CAVvtEn4qXNU1uIPUvNp4.PF7h5Wy1kilDOiKh8vXAJwkMfAL8GLa",
       "name": "Nina",
-      "status": "approved",
+      "status": "denied",
       "role": "watcher",
       "permanent": false,
       "created_at": 1782752128941,
-      "updated_at": 1782758323321
+      "updated_at": 1783524467837
     },
     {
       "id": 12,
