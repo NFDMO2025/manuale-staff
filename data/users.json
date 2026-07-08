@@ -5,11 +5,11 @@
       "username": "admin",
       "password_hash": "$2a$10$A7v3zaGIrXGLFdRWARJuaO2EXoz2aHOa6bivyHokqMyOiPZFT62Lu",
       "name": "Amministratore",
-      "status": "approved",
+      "status": "denied",
       "role": "admin",
       "permanent": true,
       "created_at": 1782432143510,
-      "updated_at": 1782432143510
+      "updated_at": 1783524477308
     },
     {
       "id": 2,
