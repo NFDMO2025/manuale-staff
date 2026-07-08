@@ -61,7 +61,7 @@ function getFilteredClips() {
     if (!q) return true;
 
     const categoryLabel = categoryMap.get(clip.category)?.label || clip.category;
-    const haystack = `${clip.title} ${clip.fileName} ${categoryLabel} ${clip.dateHint || ''}`.toLowerCase();
+    const haystack = `${clip.title} ${clip.fileName} ${clip.description || ''} ${categoryLabel} ${clip.dateHint || ''} ${(clip.tags || []).join(' ')}`.toLowerCase();
     return haystack.includes(q);
   });
 }
@@ -162,13 +162,23 @@ function renderClips(clips) {
   grid.innerHTML = clips
     .map((clip) => {
       const category = categoryMap.get(clip.category);
+      const isImage = clip.type === 'image';
+      const thumbStyle = isImage && clip.url ? `style="background-image:url('${escapeHtml(clip.url)}')"` : '';
+      const thumbClass = isImage ? 'clip-thumb clip-thumb-image' : 'clip-thumb';
+      const typeLabel = isImage ? 'Screenshot' : 'Video';
+      const meta = [
+        clip.dateHint || formatDate(clip.modifiedAt),
+        isImage ? typeLabel : formatBytes(clip.sizeBytes),
+      ].filter(Boolean).join(' · ');
+
       return `
-        <article class="clip-card" data-clip-id="${escapeHtml(clip.id)}" tabindex="0">
-          <div class="clip-thumb" aria-hidden="true"></div>
+        <article class="clip-card ${isImage ? 'clip-card-image' : ''}" data-clip-id="${escapeHtml(clip.id)}" tabindex="0">
+          <div class="${thumbClass}" ${thumbStyle} aria-hidden="true">${isImage ? '' : ''}</div>
           <div class="clip-body">
-            <div class="clip-tag">${escapeHtml(category?.label || clip.category)}</div>
+            <div class="clip-tag">${escapeHtml(category?.label || clip.category)} · ${typeLabel}</div>
             <h4 class="clip-title">${escapeHtml(clip.title)}</h4>
-            <p class="clip-meta">${escapeHtml(clip.dateHint || formatDate(clip.modifiedAt))} · ${formatBytes(clip.sizeBytes)}</p>
+            ${clip.description ? `<p class="clip-desc">${escapeHtml(clip.description)}</p>` : ''}
+            <p class="clip-meta">${escapeHtml(meta)}</p>
           </div>
         </article>`;
     })
@@ -194,26 +204,49 @@ function openClipModal(clip) {
   const category = categoryMap.get(clip.category);
   const modal = document.getElementById('video-modal');
   const video = document.getElementById('modal-video');
+  const image = document.getElementById('modal-image');
+  const isImage = clip.type === 'image';
 
   document.getElementById('modal-category').textContent = category?.label || clip.category;
   document.getElementById('modal-title').textContent = clip.title;
-  document.getElementById('modal-meta').textContent = `${clip.dateHint || formatDate(clip.modifiedAt)} · ${formatBytes(clip.sizeBytes)}`;
+  document.getElementById('modal-meta').textContent = clip.dateHint || formatDate(clip.modifiedAt);
   document.getElementById('modal-file').textContent = clip.fileName;
 
-  video.pause();
-  video.removeAttribute('src');
-  video.load();
-  video.src = clip.url;
+  const descEl = document.getElementById('modal-description');
+  if (descEl) {
+    descEl.textContent = clip.description || '';
+    descEl.classList.toggle('hidden', !clip.description);
+  }
+
+  video.classList.toggle('hidden', isImage);
+  image.classList.toggle('hidden', !isImage);
+
+  if (isImage) {
+    video.pause();
+    video.removeAttribute('src');
+    video.load();
+    image.src = clip.url;
+    image.alt = clip.title;
+  } else {
+    image.removeAttribute('src');
+    video.pause();
+    video.removeAttribute('src');
+    video.load();
+    video.src = clip.url;
+    video.play().catch(() => {});
+  }
+
   modal.classList.remove('hidden');
-  video.play().catch(() => {});
 }
 
 function closeClipModal() {
   const modal = document.getElementById('video-modal');
   const video = document.getElementById('modal-video');
+  const image = document.getElementById('modal-image');
   video.pause();
   video.removeAttribute('src');
   video.load();
+  image.removeAttribute('src');
   modal.classList.add('hidden');
 }
 

@@ -1,9 +1,9 @@
 services:
   - type: web
-    name: denuncia-sociale
+    name: manuale-staff
     runtime: node
     plan: free
-    buildCommand: npm install
+    buildCommand: npm install && git lfs pull
     startCommand: npm start
     envVars:
       - key: NODE_ENV

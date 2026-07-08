@@ -92,21 +92,44 @@ function buildDenuncePayload() {
   const config = loadConfig();
   const files = listVideoFiles();
 
-  const clips = files.map(({ fileName, stat }, index) => {
+  const videoClips = files.map(({ fileName, stat }, index) => {
     const categoryId = categorize(fileName, config);
     const title = humanizeFileName(fileName);
     const id = `${slugify(fileName)}-${index}`;
 
     return {
       id,
+      type: 'video',
       fileName,
       title,
       category: categoryId,
+      description: '',
       dateHint: extractDateHint(fileName),
       modifiedAt: stat.mtime.toISOString(),
       sizeBytes: stat.size,
       url: `/Video/${encodeURIComponent(fileName)}`,
+      tags: [],
     };
+  });
+
+  const curatedItems = (config.items || []).map((item) => ({
+    type: item.type || 'image',
+    fileName: item.fileName || path.basename(item.url || ''),
+    title: item.title || humanizeFileName(item.fileName || ''),
+    category: item.category || config.defaultCategory || 'altro',
+    description: item.description || '',
+    dateHint: item.dateHint || null,
+    modifiedAt: item.modifiedAt || new Date().toISOString(),
+    sizeBytes: item.sizeBytes || null,
+    url: item.url,
+    tags: item.tags || [],
+    id: item.id || slugify(item.title || item.fileName),
+  }));
+
+  const clips = [...curatedItems, ...videoClips].sort((a, b) => {
+    const ta = new Date(a.modifiedAt || 0).getTime();
+    const tb = new Date(b.modifiedAt || 0).getTime();
+    return tb - ta;
   });
 
   const categories = (config.categories || []).map((cat) => ({

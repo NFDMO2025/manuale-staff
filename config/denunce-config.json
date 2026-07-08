@@ -3,7 +3,7 @@
     "title": "Denuncia Sociale",
     "subtitle": "Archivio pubblico di prove e clip",
     "description": "Documentazione pubblica di decisioni discutibili dello staff, assistenze penose, insulti e comportamenti tossici riversati sui giocatori.",
-    "disclaimer": "Contenuti derivati da clip e registrazioni presenti nella cartella Video. Nessun login richiesto."
+    "disclaimer": "Contenuti derivati da clip, screenshot e registrazioni presenti nelle cartelle Video e Prove. Nessun login richiesto."
   },
   "categories": [
     {
@@ -42,5 +42,18 @@
       "keywords": []
     }
   ],
-  "defaultCategory": "altro"
+  "defaultCategory": "altro",
+  "items": [
+    {
+      "id": "metagame-criroma-founder",
+      "type": "image",
+      "title": "Metagame — CriRoma-Aureliano (Founder)",
+      "category": "rp",
+      "description": "Il Founder CriRoma-Aureliano conferma in chat che informazioni derivate da ticket OOC sono considerate valide in RP, giustificando indagini su Powder nonostante lo snitch riguardasse un'altra fazione.",
+      "url": "/prove/metagame-criroma-aureliano-founder.png",
+      "fileName": "metagame-criroma-aureliano-founder.png",
+      "dateHint": "Chat staff · 15:30–15:44",
+      "tags": ["metagame", "founder", "criroma", "ticket", "powder", "indagine"]
+    }
+  ]
 }
