@@ -71,11 +71,11 @@
       "username": "frocione",
       "password_hash": "$2a$10$jgGShb2HiigXxd7xytfDM.90nEP2V0mtwMf.1ZhdwoipGjVUl6Jsm",
       "name": "Il frocione",
-      "status": "approved",
+      "status": "denied",
       "role": "editor",
       "permanent": false,
       "created_at": 1782476960738,
-      "updated_at": 1782476979027
+      "updated_at": 1783524364100
     },
     {
       "id": 8,
