@@ -16,11 +16,11 @@
       "username": "loree",
       "password_hash": "$2a$10$z3/.YGjkaOYnr8W9RDft2.tZwYkGufWGYa3QP1/tiFNQYLgjLwQRS",
       "name": "loree",
-      "status": "approved",
+      "status": "denied",
       "role": "admin",
       "permanent": false,
       "created_at": 1782432501053,
-      "updated_at": 1782432635027
+      "updated_at": 1783524325716
     },
     {
       "id": 3,
