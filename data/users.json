@@ -192,11 +192,11 @@
       "username": "kalyx",
       "password_hash": "$2a$10$egIhCTTtDfrmkpR.jDS9r.6RSapjuOJxUna.h/y23xnvg8.AuUX/a",
       "name": "ALESSIO CIMA",
-      "status": "approved",
+      "status": "denied",
       "role": "watcher",
       "permanent": false,
       "created_at": 1782753515522,
-      "updated_at": 1782758231991
+      "updated_at": 1783524422845
     },
     {
       "id": 19,
