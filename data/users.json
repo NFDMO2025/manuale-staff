@@ -159,11 +159,11 @@
       "username": "paulvape",
       "password_hash": "$2a$10$ltrjHApK0j5GXwnvd3AyIO7jTrrg5RmhWQ49aX3kms88Q4tHHRXhu",
       "name": "Paul Vape",
-      "status": "approved",
+      "status": "denied",
       "role": "watcher",
       "permanent": false,
       "created_at": 1782752253318,
-      "updated_at": 1782758296235
+      "updated_at": 1783524434909
     },
     {
       "id": 16,
