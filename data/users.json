@@ -225,11 +225,11 @@
       "username": "pumas",
       "password_hash": "$2a$10$reI7rUJgR/3P2t7S8j0opOYC//wsH3/oDeg284/hwKy5uJ.211rd2",
       "name": "Pumas",
-      "status": "approved",
+      "status": "denied",
       "role": "watcher",
       "permanent": false,
       "created_at": 1782754981335,
-      "updated_at": 1782758213655
+      "updated_at": 1783524316272
     },
     {
       "id": 22,
