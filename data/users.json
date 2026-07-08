@@ -203,11 +203,11 @@
       "username": "ladymulan",
       "password_hash": "$2a$10$VCH.dKPhkna84mRZdYqC5Om4zuoK4uYD/ckfy0ZSxWHk.diKWvxci",
       "name": "Ladymulan",
-      "status": "approved",
+      "status": "denied",
       "role": "watcher",
       "permanent": false,
       "created_at": 1782753549077,
-      "updated_at": 1782758226069
+      "updated_at": 1783524400348
     },
     {
       "id": 20,
