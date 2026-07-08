@@ -49,11 +49,11 @@
       "username": "pit",
       "password_hash": "$2a$10$MNK3yFTRNc/sH632T5C25eFjFTCr0yMZH32VEGOXwrAwWhp9cQcsm",
       "name": "Pit",
-      "status": "approved",
+      "status": "denied",
       "role": "editor",
       "permanent": false,
       "created_at": 1782470015792,
-      "updated_at": 1782470046815
+      "updated_at": 1783524345425
     },
     {
       "id": 6,
