@@ -181,11 +181,11 @@
       "username": "krikka",
       "password_hash": "$2a$10$iwYZRBh8HDaN6iuWpWCfvu.VWwYcFVhq.WVsdgwbnrRUZujzM2VGq",
       "name": "Josh Homme",
-      "status": "approved",
+      "status": "denied",
       "role": "watcher",
       "permanent": false,
       "created_at": 1782753506621,
-      "updated_at": 1782758283647
+      "updated_at": 1783524427313
     },
     {
       "id": 18,
