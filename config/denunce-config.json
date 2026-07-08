@@ -35,6 +35,13 @@
       "keywords": ["fail", "powergame", "metagame", "rdm", "vdm", "combat"]
     },
     {
+      "id": "opinioni",
+      "label": "Opinioni dei player",
+      "icon": "OP",
+      "description": "Reazioni, frustrazioni e giudizi dei giocatori verso lo staff e le sue decisioni.",
+      "keywords": ["opinioni", "player", "clown", "doc"]
+    },
+    {
       "id": "altro",
       "label": "Altri episodi",
       "icon": "AE",
@@ -54,6 +61,17 @@
       "fileName": "metagame-criroma-aureliano-founder.png",
       "dateHint": "Chat staff · 15:30–15:44",
       "tags": ["metagame", "founder", "criroma", "ticket", "powder", "indagine"]
+    },
+    {
+      "id": "opinioni-doc-staffer-clown",
+      "type": "image",
+      "title": "Doc è un clown — Opinioni dei player",
+      "category": "opinioni",
+      "description": "Firekeeper_ITA definisce Doc «staffer clown», lamentando 2 ore di RP buttate dopo che qualcuno aveva fatto credere fosse un perma. WaLuigi (NFDM) reagisce con frustrazione sulla gestione.",
+      "url": "/prove/opinioni-doc-staffer-clown.png",
+      "fileName": "opinioni-doc-staffer-clown.png",
+      "dateHint": "29/06/2026 · 14:39–14:41",
+      "tags": ["doc", "clown", "staffer", "perma", "waluigi", "firekeeper", "opinioni"]
     }
   ]
 }
