@@ -19,6 +19,7 @@
   --accent: #ef4444;
   --accent-soft: rgba(239, 68, 68, 0.14);
   --accent-2: #f97316;
+  --gamma-green: #4ade80;
   --warn: #fbbf24;
   --radius-sm: 10px;
   --radius-md: 16px;
@@ -35,7 +36,9 @@ html {
 
 body {
   font-family: var(--sans);
-  background: var(--bg);
+  background:
+    linear-gradient(rgba(10, 10, 12, 0.94), rgba(10, 10, 12, 0.97)),
+    url('../images/circo-gamma-hero.png') center top / cover fixed;
   color: var(--ink);
   min-height: 100vh;
   line-height: 1.6;
@@ -176,6 +179,58 @@ body {
   box-shadow: var(--shadow);
 }
 
+.hero-circo {
+  position: relative;
+  overflow: hidden;
+  min-height: 300px;
+  border-color: rgba(74, 222, 128, 0.18);
+  background: transparent;
+  box-shadow:
+    0 24px 80px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    url('../images/circo-gamma-hero.png') center 30% / cover no-repeat;
+  transform: scale(1.02);
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(105deg, rgba(10, 10, 12, 0.96) 0%, rgba(10, 10, 12, 0.82) 42%, rgba(10, 10, 12, 0.45) 72%, rgba(10, 10, 12, 0.25) 100%),
+    linear-gradient(180deg, transparent 55%, rgba(10, 10, 12, 0.7) 100%);
+}
+
+.hero-circo .hero-copy,
+.hero-circo .hero-stats {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-circo .hero-eyebrow {
+  color: var(--gamma-green);
+  text-shadow: 0 0 24px rgba(74, 222, 128, 0.35);
+}
+
+.hero-circo .hero-title {
+  text-shadow: 0 4px 30px rgba(0, 0, 0, 0.65);
+}
+
+.hero-circo .hero-sub,
+.hero-circo .hero-desc {
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.8);
+}
+
+.hero-circo .stat-card {
+  background: rgba(10, 10, 12, 0.72);
+  backdrop-filter: blur(8px);
+}
+
 .hero-eyebrow {
   font-size: 12px;
   text-transform: uppercase;
@@ -242,7 +297,8 @@ body {
   padding: 18px;
   border-radius: var(--radius-md);
   border: 1px solid var(--line);
-  background: var(--surface);
+  background: rgba(23, 23, 31, 0.82);
+  backdrop-filter: blur(10px);
   color: inherit;
   cursor: pointer;
   transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
@@ -290,6 +346,14 @@ body {
   font-family: var(--mono);
   font-size: 12px;
   color: var(--accent-2);
+}
+
+.content {
+  padding: 24px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--line);
+  background: rgba(10, 10, 12, 0.78);
+  backdrop-filter: blur(12px);
 }
 
 .content-head {
@@ -573,7 +637,12 @@ body {
     font-size: 24px;
   }
 
-  .hero {
-    padding: 20px;
+  .hero-circo {
+    min-height: 260px;
+    padding: 22px;
+  }
+
+  .hero-bg {
+    background-position: 65% center;
   }
 }
